@@ -16,7 +16,7 @@
                   {
                       "group": "Getting started",
                       "pages": [
-                          "index",
+                          "index"
                       ]
                   },
                   {
@@ -26,12 +26,17 @@
                       ]
                   },
                   {
-                      "group": "Endpoints",
+                      "group": "Polymarket Endpoints",
                       "pages": [
-                          "api-reference/endpoint/get",
-                          "api-reference/endpoint/create",
-                          "api-reference/endpoint/delete",
-                          "api-reference/endpoint/webhook"
+                          "api-reference/endpoint/get-market-price",
+                          "api-reference/endpoint/get-candlestick"
+
+                      ]
+                  },
+                  {
+                      "group": "Kalshi Endpoints",
+                      "pages": [
+                          
                       ]
                   }
               ]
