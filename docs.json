@@ -3,106 +3,85 @@
   "theme": "maple",
   "name": "Dome API",
   "colors": {
-    "primary": "#6c28d9",
-    "light": "#a675eb",
-    "dark": "#6c28d9"
+      "primary": "#6c28d9",
+      "light": "#a675eb",
+      "dark": "#6c28d9"
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
+      "tabs": [
           {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          }        
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+              "tab": "Guides",
+              "groups": [
+                  {
+                      "group": "Getting started",
+                      "pages": [
+                          "index",
+                          "quickstart",
+                          "development"
+                      ]
+                  },
+                  {
+                      "group": "API documentation",
+                      "pages": [
+                          "api-reference/introduction"
+                      ]
+                  },
+                  {
+                      "group": "Endpoint examples",
+                      "pages": [
+                          "api-reference/endpoint/get",
+                          "api-reference/endpoint/create",
+                          "api-reference/endpoint/delete",
+                          "api-reference/endpoint/webhook"
+                      ]
+                  }
+              ]
           }
-        ]
+      ],
+      "global": {
+          "anchors": [
+              {
+                  "anchor": "Community",
+                  "href": "https://discord.gg/fKAbjNAbkt",
+                  "icon": "discord"
+              }
+          ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Community",
-          "href": "https://discord.gg/fKAbjNAbkt",
-          "icon": "discord"
-        }
-      ]
-    }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+      "light": "/logo/light.svg",
+      "dark": "/logo/dark.svg"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:info@domeapi.io"
+      "links": [
+          {
+              "label": "Support",
+              "href": "mailto:info@domeapi.io"
+          }
+      ],
+      "primary": {
+          "type": "button",
+          "label": "Dashboard",
+          "href": "https://domeapi.io"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://domeapi.io"
-    }
   },
   "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "options": [
+          "copy",
+          "view",
+          "chatgpt",
+          "claude",
+          "perplexity",
+          "mcp",
+          "cursor",
+          "vscode"
+      ]
   },
   "footer": {
-    "socials": {
-      "x": "https://x.com/trydomeapi",
-      "github": "https://github.com/kurushdubash/dome-sdk-ts"
-    }
+      "socials": {
+          "x": "https://x.com/trydomeapi",
+          "github": "https://github.com/kurushdubash/dome-sdk-ts"
+      }
   }
 }
