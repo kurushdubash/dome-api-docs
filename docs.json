@@ -17,8 +17,6 @@
                       "group": "Getting started",
                       "pages": [
                           "index",
-                          "quickstart",
-                          "development"
                       ]
                   },
                   {
@@ -28,7 +26,7 @@
                       ]
                   },
                   {
-                      "group": "Endpoint examples",
+                      "group": "Endpoints",
                       "pages": [
                           "api-reference/endpoint/get",
                           "api-reference/endpoint/create",
@@ -42,7 +40,7 @@
       "global": {
           "anchors": [
               {
-                  "anchor": "Community",
+                  "anchor": "Discord",
                   "href": "https://discord.gg/fKAbjNAbkt",
                   "icon": "discord"
               }
