@@ -185,9 +185,6 @@
                     "start_time": { "type": "number", "example": 1726857600 },
                     "end_time": { "type": "number", "example": 1758316829 },
                     "wallet_address": { "type": "string", "example": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b" },
-                    "total_buys": { "type": "number", "example": 12501 },
-                    "total_sells": { "type": "number", "example": 10500 },
-                    "net_pnl": { "type": "number", "example": 2001 },
                     "pnl_over_time": {
                       "type": "array",
                       "items": {
