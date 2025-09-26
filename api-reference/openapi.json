@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://api.domeapi.io/v1/polymarket"
+      "url": "https://api.domeapi.io/v1/polymarket"
     }
   ],
   "paths": {
