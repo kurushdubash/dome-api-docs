@@ -2,6 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
   "name": "Dome API",
+  "openapi": "api-reference/openapi.json",
   "colors": {
       "primary": "#6c28d9",
       "light": "#a675eb",
@@ -28,6 +29,7 @@
                   {
                       "group": "Polymarket Endpoints",
                       "pages": [
+                          "api-reference/endpoint/get-order-history",
                           "api-reference/endpoint/get-market-price",
                           "api-reference/endpoint/get-candlestick",
                           "api-reference/endpoint/get-wallet-pnl"
@@ -83,7 +85,7 @@
   },
   "footer": {
       "socials": {
-          "x": "https://x.com/trydomeapi",
+          "x": "https://x.com/getdomeapi",
           "github": "https://github.com/kurushdubash/dome-sdk-ts"
       }
   }
