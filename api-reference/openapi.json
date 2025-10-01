@@ -60,8 +60,8 @@
       ],
       "get": {
         "operationId": "getCandlesticks",
-        "summary": "Candlestick API",
-        "description": "Fetches historical candlestick data for a market identified by `condition_id`, over a specified interval.",
+        "summary": "Get Candlestick API",
+        "description": "Fetches historical candlestick data for a market identified by `token id`, over a specified interval.",
         "parameters": [
           {
             "name": "start_time",
