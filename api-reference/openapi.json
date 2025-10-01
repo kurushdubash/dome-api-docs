@@ -95,68 +95,56 @@
                   "properties": {
                     "candlesticks": {
                       "type": "array",
+                      "description": "Array of market candlestick data, where each element is a tuple containing candlestick data array and token metadata",
                       "items": {
                         "type": "array",
-                        "items": [
-                          {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "end_period_ts": { "type": "integer", "example": 1727827200 },
-                                "open_interest": { "type": "integer", "example": 8456498 },
-                                "price": {
-                                  "type": "object",
-                                  "properties": {
-                                    "open": { "type": "number", "example": 0 },
-                                    "high": { "type": "number", "example": 0 },
-                                    "low": { "type": "number", "example": 0 },
-                                    "close": { "type": "number", "example": 0 },
-                                    "open_dollars": { "type": "string", "example": "0.0049" },
-                                    "high_dollars": { "type": "string", "example": "0.0049" },
-                                    "low_dollars": { "type": "string", "example": "0.0048" },
-                                    "close_dollars": { "type": "string", "example": "0.0048" },
-                                    "mean": { "type": "number", "example": 0 },
-                                    "mean_dollars": { "type": "string", "example": "0.0049" },
-                                    "previous": { "type": "number", "example": 0 },
-                                    "previous_dollars": { "type": "string", "example": "0.0049" }
-                                  }
-                                },
-                                "volume": { "type": "integer", "example": 8456498 },
-                                "yes_ask": {
-                                  "type": "object",
-                                  "properties": {
-                                    "open": { "type": "number", "example": 0.00489 },
-                                    "close": { "type": "number", "example": 0.0048200000000000005 },
-                                    "high": { "type": "number", "example": 0.00491 },
-                                    "low": { "type": "number", "example": 0.0048 },
-                                    "open_dollars": { "type": "string", "example": "0.0049" },
-                                    "close_dollars": { "type": "string", "example": "0.0048" },
-                                    "high_dollars": { "type": "string", "example": "0.0049" },
-                                    "low_dollars": { "type": "string", "example": "0.0048" }
-                                  }
-                                },
-                                "yes_bid": {
-                                  "type": "object",
-                                  "properties": {
-                                    "open": { "type": "number", "example": 0.00489 },
-                                    "close": { "type": "number", "example": 0.004829999990880811 },
-                                    "high": { "type": "number", "example": 0.004910000000138527 },
-                                    "low": { "type": "number", "example": 0.0048 },
-                                    "open_dollars": { "type": "string", "example": "0.0049" },
-                                    "close_dollars": { "type": "string", "example": "0.0048" },
-                                    "high_dollars": { "type": "string", "example": "0.0049" },
-                                    "low_dollars": { "type": "string", "example": "0.0048" }
-                                  }
-                                }
+                        "description": "Tuple of [candlestick_data_array, token_metadata]",
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "example": [
+                          [
+                            {
+                              "end_period_ts": 1727827200,
+                              "open_interest": 8456498,
+                              "price": {
+                                "open": 0,
+                                "high": 0,
+                                "low": 0,
+                                "close": 0,
+                                "open_dollars": "0.0049",
+                                "high_dollars": "0.0049",
+                                "low_dollars": "0.0048",
+                                "close_dollars": "0.0048",
+                                "mean": 0,
+                                "mean_dollars": "0.0049",
+                                "previous": 0,
+                                "previous_dollars": "0.0049"
+                              },
+                              "volume": 8456498,
+                              "yes_ask": {
+                                "open": 0.00489,
+                                "close": 0.0048200000000000005,
+                                "high": 0.00491,
+                                "low": 0.0048,
+                                "open_dollars": "0.0049",
+                                "close_dollars": "0.0048",
+                                "high_dollars": "0.0049",
+                                "low_dollars": "0.0048"
+                              },
+                              "yes_bid": {
+                                "open": 0.00489,
+                                "close": 0.004829999990880811,
+                                "high": 0.004910000000138527,
+                                "low": 0.0048,
+                                "open_dollars": "0.0049",
+                                "close_dollars": "0.0048",
+                                "high_dollars": "0.0049",
+                                "low_dollars": "0.0048"
                               }
                             }
-                          },
+                          ],
                           {
-                            "type": "object",
-                            "properties": {
-                              "token_id": { "type": "string", "example": "21742633143463906290569050155826241533067272736897614950488156847949938836455" }
-                            }
+                            "token_id": "21742633143463906290569050155826241533067272736897614950488156847949938836455"
                           }
                         ]
                       }
