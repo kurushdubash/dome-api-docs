@@ -272,14 +272,21 @@
       "get": {
         "operationId": "getMatchingMarketsSports",
         "summary": "Get Matching Markets for Sports",
-        "description": "Find equivalent markets across different prediction market platforms (Polymarket, Kalshi, etc.) for sports events using a Polymarket market slug.",
+        "description": "Find equivalent markets across different prediction market platforms (Polymarket, Kalshi, etc.) for sports events. Provide either a Polymarket market slug or a Kalshi event ticker.",
         "parameters": [
           {
             "name": "polymarket_market_slug",
             "in": "query",
-            "required": true,
+            "required": false,
             "description": "The Polymarket market slug to find matching markets for",
             "schema": { "type": "string", "example": "nfl-ari-den-2025-08-16" }
+          },
+          {
+            "name": "kalshi_event_ticker",
+            "in": "query",
+            "required": false,
+            "description": "The Kalshi event ticker to find matching markets for",
+            "schema": { "type": "string", "example": "KXNFLGAME-25AUG16ARIDEN" }
           }
         ],
         "responses": {
@@ -361,7 +368,7 @@
                   "type": "object",
                   "properties": {
                     "error": { "type": "string", "example": "Missing required parameter" },
-                    "message": { "type": "string", "example": "polymarket_market_slug is required" }
+                    "message": { "type": "string", "example": "Either polymarket_market_slug or kalshi_event_ticker is required" }
                   }
                 }
               }
