@@ -268,6 +268,122 @@
         }
       }
     },
+    "/matching-markets/sports/": {
+      "get": {
+        "operationId": "getMatchingMarketsSports",
+        "summary": "Get Matching Markets for Sports",
+        "description": "Find equivalent markets across different prediction market platforms (Polymarket, Kalshi, etc.) for sports events using a Polymarket market slug.",
+        "parameters": [
+          {
+            "name": "polymarket_market_slug",
+            "in": "query",
+            "required": true,
+            "description": "The Polymarket market slug to find matching markets for",
+            "schema": { "type": "string", "example": "nfl-ari-den-2025-08-16" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching markets response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "markets": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "description": "Kalshi market",
+                              "properties": {
+                                "platform": { "type": "string", "enum": ["KALSHI"], "example": "KALSHI" },
+                                "event_ticker": { "type": "string", "example": "KXNFLGAME-25AUG16ARIDEN" },
+                                "market_tickers": {
+                                  "type": "array",
+                                  "items": { "type": "string" },
+                                  "example": ["KXNFLGAME-25AUG16ARIDEN-ARI", "KXNFLGAME-25AUG16ARIDEN-DEN"]
+                                }
+                              },
+                              "required": ["platform", "event_ticker", "market_tickers"]
+                            },
+                            {
+                              "type": "object",
+                              "description": "Polymarket market",
+                              "properties": {
+                                "platform": { "type": "string", "enum": ["POLYMARKET"], "example": "POLYMARKET" },
+                                "market_slug": { "type": "string", "example": "nfl-ari-den-2025-08-16" },
+                                "token_ids": {
+                                  "type": "array",
+                                  "items": { "type": "string" },
+                                  "example": [
+                                    "34541522652444763571858406546623861155130750437169507355470933750634189084033",
+                                    "104612081187206848956763018128517335758189185749897027211060738913329108425255"
+                                  ]
+                                }
+                              },
+                              "required": ["platform", "market_slug", "token_ids"]
+                            }
+                          ]
+                        }
+                      },
+                      "example": {
+                        "nfl-ari-den-2025-08-16": [
+                          {
+                            "platform": "KALSHI",
+                            "event_ticker": "KXNFLGAME-25AUG16ARIDEN",
+                            "market_tickers": ["KXNFLGAME-25AUG16ARIDEN-ARI", "KXNFLGAME-25AUG16ARIDEN-DEN"]
+                          },
+                          {
+                            "platform": "POLYMARKET",
+                            "market_slug": "nfl-ari-den-2025-08-16",
+                            "token_ids": [
+                              "34541522652444763571858406546623861155130750437169507355470933750634189084033",
+                              "104612081187206848956763018128517335758189185749897027211060738913329108425255"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Missing required parameter" },
+                    "message": { "type": "string", "example": "polymarket_market_slug is required" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - No matching markets found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Not found" },
+                    "message": { "type": "string", "example": "No matching markets found for the provided slug" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/orders": {
   "get": {
     "operationId": "getOrders",

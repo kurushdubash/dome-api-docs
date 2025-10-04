@@ -27,6 +27,12 @@
                       ]
                   },
                   {
+                      "group": "Cross-Platform Endpoints",
+                      "pages": [
+                          "api-reference/endpoint/get-matching-markets-sports"
+                      ]
+                  },
+                  {
                       "group": "Polymarket Endpoints",
                       "pages": [
                           "api-reference/endpoint/get-order-history",
@@ -38,7 +44,7 @@
                   {
                       "group": "Kalshi Endpoints",
                       "pages": [
-                          
+
                       ]
                   }
               ]
