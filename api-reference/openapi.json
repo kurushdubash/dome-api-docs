@@ -6,10 +6,10 @@
     "version": "0.0.1"
   },
   "servers": [
-    { "url": "https://api.domeapi.io/v1/polymarket" }
+    { "url": "https://api.domeapi.io/v1/" }
   ],
   "paths": {
-    "/market-price/{token_id}": {
+    "/polymarket/market-price/{token_id}": {
       "parameters": [
         {
           "name": "token_id",
@@ -49,7 +49,7 @@
         }
       }
     },
-    "/candlesticks/{condition_id}": {
+    "/polymarket/candlesticks/{condition_id}": {
       "parameters": [
         {
           "name": "condition_id",
@@ -171,7 +171,7 @@
         }
       }
     },
-    "/wallet/pnl/{wallet_address}": {
+    "/polymarket/wallet/pnl/{wallet_address}": {
       "parameters": [
         {
           "name": "wallet_address",
@@ -391,7 +391,7 @@
         }
       }
     },
-    "/orders": {
+    "/polymarket/orders": {
   "get": {
     "operationId": "getOrders",
     "summary": "Get Orders",
