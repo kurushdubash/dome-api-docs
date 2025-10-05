@@ -272,21 +272,33 @@
       "get": {
         "operationId": "getMatchingMarketsSports",
         "summary": "Get Matching Markets for Sports",
-        "description": "Find equivalent markets across different prediction market platforms (Polymarket, Kalshi, etc.) for sports events. Provide either a Polymarket market slug or a Kalshi event ticker.",
+        "description": "Find equivalent markets across different prediction market platforms (Polymarket, Kalshi, etc.) for sports events. Provide either one or more Polymarket market slugs or Kalshi event tickers.",
         "parameters": [
           {
             "name": "polymarket_market_slug",
             "in": "query",
             "required": false,
-            "description": "The Polymarket market slug to find matching markets for",
-            "schema": { "type": "string", "example": "nfl-ari-den-2025-08-16" }
+            "description": "The Polymarket market slug(s) to find matching markets for. Can be provided multiple times.",
+            "schema": { 
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["nfl-ari-den-2025-08-16", "nfl-dal-phi-2025-09-04"]
+            },
+            "style": "form",
+            "explode": true
           },
           {
             "name": "kalshi_event_ticker",
             "in": "query",
             "required": false,
-            "description": "The Kalshi event ticker to find matching markets for",
-            "schema": { "type": "string", "example": "KXNFLGAME-25AUG16ARIDEN" }
+            "description": "The Kalshi event ticker(s) to find matching markets for. Can be provided multiple times.",
+            "schema": { 
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["KXNFLGAME-25AUG16ARIDEN", "KXNFLGAME-25SEP04DALPHI"]
+            },
+            "style": "form",
+            "explode": true
           }
         ],
         "responses": {
@@ -352,6 +364,13 @@
                               "104612081187206848956763018128517335758189185749897027211060738913329108425255"
                             ]
                           }
+                        ],
+                        "nfl-dal-phi-2025-09-04": [
+                          {
+                            "platform": "KALSHI",
+                            "event_ticker": "KXNFLGAME-25SEP04DALPHI",
+                            "market_tickers": ["KXNFLGAME-25SEP04DALPHI-DAL", "KXNFLGAME-25SEP04DALPHI-PHI"]
+                          }
                         ]
                       }
                     }
@@ -368,7 +387,7 @@
                   "type": "object",
                   "properties": {
                     "error": { "type": "string", "example": "Missing required parameter" },
-                    "message": { "type": "string", "example": "Either polymarket_market_slug or kalshi_event_ticker is required" }
+                    "message": { "type": "string", "example": "At least one polymarket_market_slug or kalshi_event_ticker is required" }
                   }
                 }
               }
@@ -382,7 +401,7 @@
                   "type": "object",
                   "properties": {
                     "error": { "type": "string", "example": "Not found" },
-                    "message": { "type": "string", "example": "No matching markets found for the provided slug" }
+                    "message": { "type": "string", "example": "No matching markets found for the provided parameters" }
                   }
                 }
               }
