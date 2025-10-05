@@ -278,7 +278,7 @@
             "name": "polymarket_market_slug",
             "in": "query",
             "required": false,
-            "description": "The Polymarket market slug(s) to find matching markets for. Can be provided multiple times.",
+            "description": "The Polymarket market slug(s) to find matching markets for. To get multiple markets at once, provide the query param multiple times with different slugs. Can not be combined with kalshi_event_ticker.",
             "schema": { 
               "type": "array",
               "items": { "type": "string" },
@@ -291,7 +291,7 @@
             "name": "kalshi_event_ticker",
             "in": "query",
             "required": false,
-            "description": "The Kalshi event ticker(s) to find matching markets for. Can be provided multiple times.",
+            "description": "The Kalshi event ticker(s) to find matching markets for. To get multiple markets at once, provide the query param multiple times with different tickers. Can not be combined with polymarket_market_slug.",
             "schema": { 
               "type": "array",
               "items": { "type": "string" },
