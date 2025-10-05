@@ -21,15 +21,10 @@
                       ]
                   },
                   {
-                      "group": "API documentation",
+                      "group": "Matching Markets",
                       "pages": [
-                          "api-reference/introduction"
-                      ]
-                  },
-                  {
-                      "group": "Cross-Platform Endpoints",
-                      "pages": [
-                          "api-reference/endpoint/get-matching-markets-sports"
+                          "api-reference/endpoint/get-matching-markets-sports",
+                          "api-reference/endpoint/get-matching-markets-sports-sport"
                       ]
                   },
                   {
@@ -68,7 +63,7 @@
       "links": [
           {
               "label": "Support",
-              "href": "mailto:support@domtlcoueapi.io"
+              "href": "mailto:support@domeapi.com"
           }
       ],
       "primary": {
