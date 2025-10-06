@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Post-checkout hook to automatically install git hooks
+# This runs after git clone, git checkout, etc.
+
+echo "🔧 Auto-installing git hooks..."
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+cd "$REPO_ROOT"
+
+# Check if we need to install hooks
+HOOKS_INSTALLED=false
+
+# Check if our pre-push hook exists and is executable
+if [ -x ".git/hooks/pre-push" ] && cmp -s ".githooks/pre-push" ".git/hooks/pre-push"; then
+    HOOKS_INSTALLED=true
+fi
+
+if [ "$HOOKS_INSTALLED" = false ]; then
+    echo "Installing git hooks..."
+    
+    # Copy all hooks from .githooks to .git/hooks
+    for hook in .githooks/*; do
+        if [ -f "$hook" ] && [ "$(basename "$hook")" != "post-checkout" ]; then
+            hook_name=$(basename "$hook")
+            cp "$hook" ".git/hooks/$hook_name"
+            chmod +x ".git/hooks/$hook_name"
+            echo "✅ Installed $hook_name hook"
+        fi
+    done
+    
+    echo "🎉 Git hooks auto-installation complete!"
+else
+    echo "✅ Git hooks already installed and up to date"
+fi

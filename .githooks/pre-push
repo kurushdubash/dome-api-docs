@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Pre-push hook to validate OpenAPI definition
+echo "Validating OpenAPI definition before push..."
+
+# Run the mint openapi-check command
+output=$(mint openapi-check api-reference/openapi.json 2>&1)
+exit_code=$?
+
+echo "$output"
+
+# Check if the command succeeded and output contains the success message
+if [ $exit_code -eq 0 ] && echo "$output" | grep -q "success OpenAPI definition is valid"; then
+    echo "✅ OpenAPI validation passed. Proceeding with push."
+    exit 0
+else
+    echo "❌ OpenAPI validation failed. Push aborted."
+    echo "Please fix the OpenAPI definition before pushing."
+    exit 1
+fi

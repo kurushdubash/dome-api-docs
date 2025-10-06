@@ -14,6 +14,18 @@ Click the green **Use this template** button at the top of this repo to copy the
 
 ## Development
 
+### Initial Setup
+
+After cloning this repository, run the setup script to install git hooks:
+
+```bash
+./setup-hooks.sh
+```
+
+This will install pre-push hooks that validate the OpenAPI definition before allowing pushes.
+
+### Local Development
+
 Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
 
 ```
