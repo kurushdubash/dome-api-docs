@@ -361,7 +361,8 @@
                             "type": "string",
                             "example": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"
                           },
-                          "shares": { "type": "number", "example": 100.5 },
+                          "shares": { "type": "number", "example": 4995000,"description": "Raw number of shares purchased (from the blockchain) " },
+                          "shares_normalized": { "type": "number", "example": 4.995,"description": "Number of shares purchased normalized (this is raw divided by 1000000)" },
                           "price": { "type": "number", "example": 0.65 },
                           "tx_hash": {
                             "type": "string",
