@@ -735,7 +735,7 @@
           "description": "The sport to find matching markets for",
           "schema": { 
             "type": "string",
-            "enum": ["nfl", "mlb", "soccer"],
+            "enum": ["nfl", "mlb", "cfb"],
             "example": "nfl"
           }
         }
