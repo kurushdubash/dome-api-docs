@@ -31,6 +31,7 @@
                       "group": "Polymarket Endpoints",
                       "pages": [
                           "api-reference/endpoint/get-order-history",
+                          "api-reference/endpoint/get-orderbook-history",
                           "api-reference/endpoint/get-market-price",
                           "api-reference/endpoint/get-candlestick",
                           "api-reference/endpoint/get-wallet-pnl"

@@ -472,6 +472,118 @@
         }
       }
     },
+    "/polymarket/orderbookHistory": {
+      "get": {
+        "operationId": "getOrderbookHistory",
+        "summary": "Get Orderbook History",
+        "description": "Fetches historical orderbook snapshots for a specific asset (token) over a specified time range. Returns snapshots of the order book including bids, asks, and market metadata. Everything is ordered by price. Times are in milliseconds.",
+        "parameters": [
+          {
+            "name": "assetId",
+            "in": "query",
+            "required": true,
+            "description": "The asset ID (token ID) for the Polymarket market",
+            "schema": { "type": "string", "example": "56369772478534954338683665819559528414197495274302917800610633957542171787417" }
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": true,
+            "description": "Start time in Unix timestamp (milliseconds)",
+            "schema": { "type": "integer", "example": 1760470000000 }
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": true,
+            "description": "End time in Unix timestamp (milliseconds)",
+            "schema": { "type": "integer", "example": 1760480000000 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of snapshots to return (default: 100)",
+            "schema": { "type": "integer", "default": 100, "example": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orderbook history response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "snapshots": {
+                      "type": "array",
+                      "description": "Array of orderbook snapshots at different points in time",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "asks": {
+                            "type": "array",
+                            "description": "Sell orders, ordered by price",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "size": { "type": "string", "example": "5000013.15" },
+                                "price": { "type": "string", "example": "0.999" }
+                              }
+                            }
+                          },
+                          "bids": {
+                            "type": "array",
+                            "description": "Buy orders, ordered by price",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "size": { "type": "string", "example": "438389.53" },
+                                "price": { "type": "string", "example": "0.001" }
+                              }
+                            }
+                          },
+                          "hash": { "type": "string", "example": "85c493ebeea97e2f70c85a1469aede05f892408f" },
+                          "minOrderSize": { "type": "string", "example": "5" },
+                          "negRisk": { "type": "boolean", "example": true },
+                          "assetId": { "type": "string", "example": "56369772478534954338683665819559528414197495274302917800610633957542171787417" },
+                          "timestamp": { "type": "integer", "description": "Timestamp of the snapshot in milliseconds", "example": 1760471849407 },
+                          "tickSize": { "type": "string", "example": "0.001" },
+                          "indexedAt": { "type": "integer", "description": "When the snapshot was indexed in milliseconds", "example": 1760471852863 },
+                          "market": { "type": "string", "example": "0xd10bc768ede58b53ed400594240b0a0603134a32dab89ec823a18759cbc180ca" }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "limit": { "type": "integer", "example": 100 },
+                        "count": { "type": "integer", "description": "Number of snapshots returned", "example": 4 },
+                        "has_more": { "type": "boolean", "description": "Whether there are more snapshots available", "example": false }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Invalid parameters" },
+                    "message": { "type": "string", "example": "assetId, start_time, and end_time are required" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/matching-markets/sports/": {
       "get": {
         "operationId": "getMatchingMarketsSports",
