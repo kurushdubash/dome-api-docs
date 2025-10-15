@@ -1,10 +1,64 @@
 ---
 title: "Dome API"
-description: "Welcome to Dome - the utlimate API for prediction markets"
+description: "Welcome to Dome - the ultimate API for prediction markets"
 ---
 
-## Get Started
+## What is Dome API?
 
-To get started, [sign up](https://www.domeapi.io/) for an account and get your API Key.
+Dome API provides comprehensive access to prediction market data across multiple platforms including Polymarket and Kalshi. Get real-time market prices, historical candlestick data, wallet analytics, order tracking, and cross-platform market matching.
 
+## Quick Start
+
+### 1. Get Your API Key
+
+[Sign up](https://www.domeapi.io/) for an account and get your API Key from the dashboard.
 ![Hero Light Pn](/images/hero-light.png)
+
+### 2. Install SDK
+
+<CodeGroup>
+```bash TypeScript
+npm install @dome-api/sdk
+```
+
+```bash Python
+pip install dome-api-sdk
+```
+
+</CodeGroup>
+
+### 3. Make Your First Request
+
+<CodeGroup>
+```typescript TypeScript
+import { DomeClient } from '@dome-api/sdk';
+
+const dome = new DomeClient({
+apiKey: 'your-api-key-here',
+});
+
+const marketPrice = await dome.polymarket.markets.getMarketPrice({
+token_id: '1234567890',
+});
+
+console.log('Market Price:', marketPrice.price);
+
+````
+
+```python Python
+from dome_api_sdk import DomeClient
+
+dome = DomeClient({"api_key": "your-api-key-here"})
+
+market_price = dome.polymarket.markets.get_market_price({
+    "token_id": "1234567890"
+})
+print(f"Market Price: {market_price.price}")
+````
+
+</CodeGroup>
+
+## Need Help?
+
+- Join our [Discord](https://discord.gg/fKAbjNAbkt) community
+- Check out our SDKs: [TypeScript](https://github.com/kurushdubash/dome-sdk-ts) | [Python](https://github.com/kurushdubash/dome-sdk-py)
