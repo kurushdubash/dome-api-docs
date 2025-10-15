@@ -479,10 +479,10 @@
         "description": "Fetches historical orderbook snapshots for a specific asset (token ID) over a specified time range. Returns snapshots of the order book including bids, asks, and market metadata in order. All timestamps are in milliseconds. Orderbook data has history starting from October 14th, 2025.",
         "parameters": [
           {
-            "name": "assetId",
+            "name": "token_id",
             "in": "query",
             "required": true,
-            "description": "The asset ID (token ID) for the Polymarket market",
+            "description": "The token id (asset) for the Polymarket market",
             "schema": { "type": "string", "example": "56369772478534954338683665819559528414197495274302917800610633957542171787417" }
           },
           {
