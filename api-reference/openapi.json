@@ -503,7 +503,7 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "Maximum number of snapshots to return (default: 100)",
+            "description": "Maximum number of snapshots to return (default: 100, max: 1000)",
             "schema": { "type": "integer", "default": 100, "example": 100 }
           }
         ],
