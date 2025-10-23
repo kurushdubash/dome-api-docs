@@ -854,13 +854,6 @@
         "description": "Fetches market data with optional filtering and search functionality. Supports filtering by market slug, condition ID, or tags, as well as fuzzy search across market titles and descriptions. Returns markets ordered by volume (most popular first) when filters are applied, or by start_time (most recent first) when no filters are provided.",
         "parameters": [
           {
-            "name": "search",
-            "in": "query",
-            "required": false,
-            "description": "Fuzzy search query to find markets by title or description. Must be at least 2 characters long. Cannot be used with other filter parameters.",
-            "schema": { "type": "string", "minLength": 2, "example": "bitcoin" }
-          },
-          {
             "name": "market_slug",
             "in": "query",
             "required": false,
