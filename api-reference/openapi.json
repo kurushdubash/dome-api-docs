@@ -846,6 +846,232 @@
           }
         }
       }
+    },
+    "/markets": {
+      "get": {
+        "operationId": "getMarkets",
+        "summary": "Get Markets",
+        "description": "Fetches market data with optional filtering and search functionality. Supports filtering by market slug, condition ID, or tags, as well as fuzzy search across market titles and descriptions. Returns markets ordered by volume (most popular first) when filters are applied, or by start_time (most recent first) when no filters are provided.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Fuzzy search query to find markets by title or description. Must be at least 2 characters long. Cannot be used with other filter parameters.",
+            "schema": { "type": "string", "minLength": 2, "example": "bitcoin" }
+          },
+          {
+            "name": "market_slug",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by market slug(s). Can provide multiple values.",
+            "schema": { 
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["bitcoin-up-or-down-july-25-8pm-et"]
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "condition_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by condition ID(s). Can provide multiple values.",
+            "schema": { 
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"]
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by tag(s). Can provide multiple values.",
+            "schema": { 
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["politics", "crypto"]
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of markets to return (1-100). Default: 10 for search, 10 for regular queries.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 10, "example": 20 }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Number of markets to skip for pagination",
+            "schema": { "type": "integer", "minimum": 0, "default": 0, "example": 0 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Markets response with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "markets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "market_slug": {
+                            "type": "string",
+                            "example": "bitcoin-up-or-down-july-25-8pm-et"
+                          },
+                          "condition_id": {
+                            "type": "string",
+                            "example": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Will Bitcoin be above $50,000 on July 25, 2025 at 8:00 PM ET?"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "This market will resolve to Yes if Bitcoin (BTC) is trading above $50,000 at 8:00 PM ET on July 25, 2025."
+                          },
+                          "outcomes": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "outcome": { "type": "string", "example": "Yes" },
+                                "token_id": { "type": "string", "example": "58519484510520807142687824915233722607092670035910114837910294451210534222702" }
+                              }
+                            },
+                            "example": [
+                              { "outcome": "Yes", "token_id": "58519484510520807142687824915233722607092670035910114837910294451210534222702" },
+                              { "outcome": "No", "token_id": "104612081187206848956763018128517335758189185749897027211060738913329108425255" }
+                            ]
+                          },
+                          "start_time": {
+                            "type": "integer",
+                            "description": "Unix timestamp in seconds when the market starts",
+                            "example": 1757008834
+                          },
+                          "end_time": {
+                            "type": "integer",
+                            "description": "Unix timestamp in seconds when the market ends",
+                            "example": 1757008834
+                          },
+                          "volume": {
+                            "type": "number",
+                            "description": "Total trading volume in USD",
+                            "example": 1250000.50
+                          },
+                          "liquidity": {
+                            "type": "number",
+                            "description": "Total liquidity in USD",
+                            "example": 500000.25
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": { "type": "string" },
+                            "example": ["crypto", "bitcoin", "price-prediction"]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["ACTIVE", "CLOSED", "RESOLVED"],
+                            "example": "ACTIVE"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "limit": { "type": "integer", "example": 20 },
+                        "offset": { "type": "integer", "example": 0 },
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of markets matching the filters",
+                          "example": 150
+                        },
+                        "has_more": {
+                          "type": "boolean",
+                          "description": "Whether there are more markets available",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters or validation errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Invalid search parameter" },
+                    "message": { "type": "string", "example": "search must be at least 2 characters long" }
+                  }
+                },
+                "examples": {
+                  "search_too_short": {
+                    "summary": "Search query too short",
+                    "value": {
+                      "error": "Invalid search parameter",
+                      "message": "search must be at least 2 characters long"
+                    }
+                  },
+                  "search_with_other_params": {
+                    "summary": "Search with other parameters",
+                    "value": {
+                      "error": "Invalid query parameters",
+                      "message": "search parameter cannot be used with other filter parameters"
+                    }
+                  },
+                  "invalid_limit": {
+                    "summary": "Invalid limit",
+                    "value": {
+                      "error": "Invalid limit parameter",
+                      "message": "limit must be a number between 1 and 100"
+                    }
+                  },
+                  "invalid_offset": {
+                    "summary": "Invalid offset",
+                    "value": {
+                      "error": "Invalid offset parameter",
+                      "message": "offset must be a non-negative number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Internal Server Error" },
+                    "message": { "type": "string", "example": "Failed to fetch markets data" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {}
