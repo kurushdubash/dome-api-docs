@@ -847,7 +847,7 @@
         }
       }
     },
-    "/markets": {
+    "/polymarket/markets": {
       "get": {
         "operationId": "getMarkets",
         "summary": "Get Markets",
