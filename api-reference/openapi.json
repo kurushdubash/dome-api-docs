@@ -81,7 +81,7 @@
             "name": "interval",
             "in": "query",
             "required": false,
-            "description": "⚠️ **Note:** There are range limits for `interval` — specifically:\n- `1m`: max range **1 week**\n- `1h`: max range **1 month**\n- `1d`: max range **1 year**\n\n",
+            "description": "Interval length: 1 = 1m, 60 = 1h, 1440 = 1d. Defaults to 1m. \n\n⚠️ **Note:** There are range limits for `interval` — specifically:\n- `1m`: max range **1 week**\n- `1h`: max range **1 month**\n- `1d`: max range **1 year**\n\n",
             "schema": { "type": "integer", "enum": [1, 60, 1440], "default": 1 }
           }
         ],
