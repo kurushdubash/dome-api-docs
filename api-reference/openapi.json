@@ -81,7 +81,8 @@
             "name": "interval",
             "in": "query",
             "required": false,
-            "description": "Interval length: 1 = 1m, 60 = 1h, 1440 = 1d. \\n Defaults to 1m. NOTE: There are range limits for interval - specifically for 1m (max range is 1 week), 1h (max range is 1 month), 1d (max range is 1 year)",
+            "x-note": "NOTE: There are range limits for interval - specifically for 1m (max range is 1 week), 1h (max range is 1 month), 1d (max range is 1 year)"
+            "description": "Interval length: 1 = 1m, 60 = 1h, 1440 = 1d. Defaults to 1m.",
             "schema": { "type": "integer", "enum": [1, 60, 1440], "default": 1 }
           }
         ],
