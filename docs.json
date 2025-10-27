@@ -42,7 +42,13 @@
                       "pages": [
 
                       ]
-                  }
+                  },
+                  {
+                    "group": "Changelog",
+                    "pages": [
+                          "changelog/changelog"
+                    ]
+                }
               ]
           }
       ],
