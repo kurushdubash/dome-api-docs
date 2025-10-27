@@ -867,6 +867,19 @@
             "explode": true
           },
           {
+            "name": "event_slug",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by event slug(s). Can provide multiple values.",
+            "schema": { 
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["presidential-election-winner-2028"]
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
             "name": "condition_id",
             "in": "query",
             "required": false,
