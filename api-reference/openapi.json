@@ -907,6 +907,20 @@
             "explode": true
           },
           {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by status (whether they're open or closed)",
+            "schema": { "type": "string", "enum": ["open", "closed"], "example": "open" }
+          },
+          {
+            "name": "min_volume",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets with total trading volume greater than or equal to this amount (USD)",
+            "schema": { "type": "number", "example": 100000 }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -991,8 +1005,8 @@
                           },
                           "status": {
                             "type": "string",
-                            "enum": ["ACTIVE", "CLOSED", "RESOLVED"],
-                            "example": "ACTIVE"
+                            "enum": ["open", "closed"],
+                            "example": "open"
                           }
                         }
                       }
