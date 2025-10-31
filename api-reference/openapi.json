@@ -1190,12 +1190,13 @@
                           },
                           "end_time": {
                             "type": "integer",
-                            "description": "Unix timestamp in seconds when the market closes",
+                            "description": "Unix timestamp in seconds when the market is scheduled to end",
                             "example": 1793775600
                           },
-                          "expiration_time": {
+                          "close_time": {
                             "type": "integer",
-                            "description": "Unix timestamp in seconds when the market expires",
+                            "nullable": true,
+                            "description": "Unix timestamp in seconds when the market actually resolves/closes (may be before end_time if market finishes early, null if not yet closed)",
                             "example": 1793775600
                           },
                           "status": {
