@@ -1094,6 +1094,179 @@
         }
       }
     },
+    "/kalshi/markets": {
+      "get": {
+        "operationId": "getKalshiMarkets",
+        "summary": "Get Kalshi Markets",
+        "description": "Fetches Kalshi market data with optional filtering by market ticker, event ticker, status, and volume. Returns markets with details including pricing, volume, and status information.",
+        "parameters": [
+          {
+            "name": "market_ticker",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by market ticker(s). Can provide multiple values.",
+            "schema": {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["KXMAYORNYCPARTY-25-D"]
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "event_ticker",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by event ticker(s). Can provide multiple values.",
+            "schema": {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["KXMAYORNYCPARTY-25"]
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by status (whether they're open or closed)",
+            "schema": { "type": "string", "enum": ["open", "closed"], "example": "open" }
+          },
+          {
+            "name": "min_volume",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets with total trading volume greater than or equal to this amount (in cents)",
+            "schema": { "type": "number", "example": 10000000 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of markets to return (1-100). Default: 10.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 10, "example": 20 }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Number of markets to skip for pagination",
+            "schema": { "type": "integer", "minimum": 0, "default": 0, "example": 0 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Kalshi markets response with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "markets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "event_ticker": {
+                            "type": "string",
+                            "description": "The Kalshi event ticker",
+                            "example": "KXMAYORNYCPARTY-25"
+                          },
+                          "market_ticker": {
+                            "type": "string",
+                            "description": "The Kalshi market ticker",
+                            "example": "KXMAYORNYCPARTY-25-D"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Market question/title",
+                            "example": "Will a representative of the Democratic party win the NYC Mayor race in 2025?"
+                          },
+                          "open_time": {
+                            "type": "integer",
+                            "description": "Unix timestamp in seconds when the market opens",
+                            "example": 1731150000
+                          },
+                          "close_time": {
+                            "type": "integer",
+                            "description": "Unix timestamp in seconds when the market closes",
+                            "example": 1793775600
+                          },
+                          "expiration_time": {
+                            "type": "integer",
+                            "description": "Unix timestamp in seconds when the market expires",
+                            "example": 1793775600
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "Market status",
+                            "enum": ["open", "closed"],
+                            "example": "open"
+                          },
+                          "last_price": {
+                            "type": "number",
+                            "description": "Last traded price in cents",
+                            "example": 89
+                          },
+                          "volume": {
+                            "type": "number",
+                            "description": "Total trading volume in cents",
+                            "example": 18261146
+                          },
+                          "volume_24h": {
+                            "type": "number",
+                            "description": "24-hour trading volume in cents",
+                            "example": 931138
+                          },
+                          "result": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Market result (null if unresolved)",
+                            "example": null
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "limit": { "type": "integer", "example": 20 },
+                        "offset": { "type": "integer", "example": 0 },
+                        "total": {
+                          "type": "integer",
+                          "description": "Total number of markets matching the filters",
+                          "example": 150
+                        },
+                        "has_more": {
+                          "type": "boolean",
+                          "description": "Whether there are more markets available",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters or validation errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Invalid limit parameter" },
+                    "message": { "type": "string", "example": "limit must be a number between 1 and 100" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/kalshi/orderbooks": {
       "get": {
         "operationId": "getKalshiOrderbooks",
