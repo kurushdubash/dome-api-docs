@@ -1098,7 +1098,7 @@
       "get": {
         "operationId": "getKalshiOrderbooks",
         "summary": "Get Kalshi Orderbook History",
-        "description": "Fetches historical orderbook snapshots for a specific Kalshi market (ticker) over a specified time range. Returns snapshots of the order book including yes/no bids and asks with prices in both cents and dollars. All timestamps are in milliseconds.",
+        "description": "Fetches historical orderbook snapshots for a specific Kalshi market (ticker) over a specified time range. Returns snapshots of the order book including yes/no bids and asks with prices in both cents and dollars. All timestamps are in milliseconds. Orderbook data has history starting from October 29th, 2025.",
         "parameters": [
           {
             "name": "ticker",
@@ -1108,14 +1108,14 @@
             "schema": { "type": "string", "example": "KXNFLGAME-25AUG16ARIDEN-ARI" }
           },
           {
-            "name": "start_ts",
+            "name": "start_time",
             "in": "query",
             "required": true,
             "description": "Start time in Unix timestamp (milliseconds)",
             "schema": { "type": "integer", "example": 1760470000000 }
           },
           {
-            "name": "end_ts",
+            "name": "end_time",
             "in": "query",
             "required": true,
             "description": "End time in Unix timestamp (milliseconds)",
@@ -1236,7 +1236,7 @@
                   "type": "object",
                   "properties": {
                     "error": { "type": "string", "example": "Invalid parameters" },
-                    "message": { "type": "string", "example": "ticker, start_ts, and end_ts are required" }
+                    "message": { "type": "string", "example": "ticker, start_time, and end_time are required" }
                   }
                 }
               }
