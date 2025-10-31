@@ -1183,12 +1183,12 @@
                             "description": "Market question/title",
                             "example": "Will a representative of the Democratic party win the NYC Mayor race in 2025?"
                           },
-                          "open_time": {
+                          "start_time": {
                             "type": "integer",
                             "description": "Unix timestamp in seconds when the market opens",
                             "example": 1731150000
                           },
-                          "close_time": {
+                          "end_time": {
                             "type": "integer",
                             "description": "Unix timestamp in seconds when the market closes",
                             "example": 1793775600
