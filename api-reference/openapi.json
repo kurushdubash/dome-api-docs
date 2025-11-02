@@ -505,6 +505,13 @@
             "required": false,
             "description": "Maximum number of snapshots to return (default: 100, max: 500)",
             "schema": { "type": "integer", "default": 100, "maximum": 500, "example": 100 }
+          },
+          {
+            "name": "pagination_key",
+            "in": "query",
+            "required": false,
+            "description": "pagination key to get the next chunk of data",
+            "schema": { "type": "string", "example": "eyJhc3NldElkIjoiMTM1ODUxMjc2NDY0NTMxMDM0ODcyMjY1MTg3ODYyNjk5NjE0MDAyMjI5NzA0NzI3MzgxMTIwOTU1NDY0MDc5MTY4NDcxMTIyNzE2NjQiLCJ0aW1lc3RhbXAiOjE3NjExMDQwOTg5MTR9" }
           }
         ],
         "responses": {
