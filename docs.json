@@ -42,7 +42,8 @@
                   {
                       "group": "Kalshi Endpoints",
                       "pages": [
-
+                          "api-reference/endpoint/get-kalshi-markets",
+                          "api-reference/endpoint/get-kalshi-orderbook-history"
                       ]
                   },
                   {
