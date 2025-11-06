@@ -1144,7 +1144,7 @@
             "name": "min_volume",
             "in": "query",
             "required": false,
-            "description": "Filter markets with total trading volume greater than or equal to this amount (in cents)",
+            "description": "Filter markets with total trading volume greater than or equal to this amount (in dollars)",
             "schema": { "type": "number", "example": 10000000 }
           },
           {
@@ -1219,12 +1219,12 @@
                           },
                           "volume": {
                             "type": "number",
-                            "description": "Total trading volume in cents",
+                            "description": "Total trading volume in dollars",
                             "example": 18261146
                           },
                           "volume_24h": {
                             "type": "number",
-                            "description": "24-hour trading volume in cents",
+                            "description": "24-hour trading volume in dollars",
                             "example": 931138
                           },
                           "result": {
