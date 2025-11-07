@@ -31,7 +31,7 @@
                       "group": "Polymarket Endpoints",
                       "pages": [
                           "api-reference/endpoint/get-markets",
-                          "api-reference/endpoint/get-order-history",
+                          "api-reference/endpoint/get-trade-history",
                           "api-reference/endpoint/get-orderbook-history",
                           "api-reference/endpoint/get-activity",
                           "api-reference/endpoint/get-market-price",
@@ -99,5 +99,11 @@
           "x": "https://x.com/getdomeapi",
           "github": "https://github.com/kurushdubash/dome-sdk-ts"
       }
-  }
+  },
+  "redirects": [
+    {
+        "source": "/api-reference/endpoint/get-order-history",
+        "destination": "/api-reference/endpoint/get-trade-history"
+    }
+]
 }
