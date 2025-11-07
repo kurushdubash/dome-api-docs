@@ -815,58 +815,110 @@
                         "properties": {
                           "market_slug": {
                             "type": "string",
-                            "example": "bitcoin-up-or-down-july-25-8pm-et"
+                            "example": "btc-updown-15m-1762516800"
                           },
                           "condition_id": {
                             "type": "string",
-                            "example": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"
+                            "example": "0x6876ac2b6174778c973c118aac287c49057c4d5360f896729209fe985a2c07fb"
                           },
                           "title": {
                             "type": "string",
-                            "example": "Will Bitcoin be above $50,000 on July 25, 2025 at 8:00 PM ET?"
-                          },
-                          "description": {
-                            "type": "string",
-                            "example": "This market will resolve to Yes if Bitcoin (BTC) is trading above $50,000 at 8:00 PM ET on July 25, 2025."
-                          },
-                          "outcomes": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "outcome": { "type": "string", "example": "Yes" },
-                                "token_id": { "type": "string", "example": "58519484510520807142687824915233722607092670035910114837910294451210534222702" }
-                              }
-                            },
-                            "example": [
-                              { "outcome": "Yes", "token_id": "58519484510520807142687824915233722607092670035910114837910294451210534222702" },
-                              { "outcome": "No", "token_id": "104612081187206848956763018128517335758189185749897027211060738913329108425255" }
-                            ]
+                            "example": "Bitcoin Up or Down - November 7, 7:00AM-7:15AM ET"
                           },
                           "start_time": {
                             "type": "integer",
                             "description": "Unix timestamp in seconds when the market starts",
-                            "example": 1757008834
+                            "example": 1762506140
                           },
                           "end_time": {
                             "type": "integer",
                             "description": "Unix timestamp in seconds when the market ends",
-                            "example": 1757008834
+                            "example": 1762517700
                           },
-                          "volume": {
-                            "type": "number",
-                            "description": "Total trading volume in USD",
-                            "example": 1250000.50
+                          "completed_time": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Unix timestamp in seconds when the market was completed",
+                            "example": null
                           },
-                          "liquidity": {
-                            "type": "number",
-                            "description": "Total liquidity in USD",
-                            "example": 500000.25
+                          "close_time": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Unix timestamp in seconds when the market was closed",
+                            "example": null
                           },
                           "tags": {
                             "type": "array",
                             "items": { "type": "string" },
-                            "example": ["crypto", "bitcoin", "price-prediction"]
+                            "example": ["Up or Down", "Crypto Prices", "Hide From New", "Recurring", "Crypto", "Bitcoin", "15M"]
+                          },
+                          "volume_1_week": {
+                            "type": "number",
+                            "description": "Trading volume in USD for the past week",
+                            "example": 0
+                          },
+                          "volume_1_month": {
+                            "type": "number",
+                            "description": "Trading volume in USD for the past month",
+                            "example": 0
+                          },
+                          "volume_1_year": {
+                            "type": "number",
+                            "description": "Trading volume in USD for the past year",
+                            "example": 0
+                          },
+                          "volume_total": {
+                            "type": "number",
+                            "description": "Total trading volume in USD",
+                            "example": 93.148228
+                          },
+                          "resolution_source": {
+                            "type": "string",
+                            "description": "URL to the data source used for market resolution",
+                            "example": "https://data.chain.link/streams/btc-usd"
+                          },
+                          "image": {
+                            "type": "string",
+                            "description": "URL to the market image",
+                            "example": "https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png"
+                          },
+                          "side_a": {
+                            "type": "object",
+                            "description": "First side/outcome of the market",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Token ID for side A",
+                                "example": "14557944883400223565643640243919774851380876937588843424705199812983475639104"
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "Label for side A",
+                                "example": "Up"
+                              }
+                            }
+                          },
+                          "side_b": {
+                            "type": "object",
+                            "description": "Second side/outcome of the market",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Token ID for side B",
+                                "example": "57567439101367774829602299916701968079591032322820664013819223989961583069589"
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "Label for side B",
+                                "example": "Down"
+                              }
+                            }
+                          },
+                          "winning_side": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "The winning side of the market (null if not yet resolved)",
+                            "example": null
                           },
                           "status": {
                             "type": "string",
