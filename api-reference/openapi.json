@@ -361,15 +361,29 @@
                             "type": "string",
                             "example": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"
                           },
-                          "shares": { "type": "number", "example": 4995000,"description": "Raw number of shares purchased (from the blockchain) " },
-                          "shares_normalized": { "type": "number", "example": 4.995,"description": "Number of shares purchased normalized (this is raw divided by 1000000)" },
-                          "price": { "type": "number", "example": 0.65 },
+                          "shares": {
+                            "type": "number",
+                            "description": "Raw number of shares purchased (from the blockchain)",
+                            "example": 4995000
+                          },
+                          "shares_normalized": {
+                            "type": "number",
+                            "description": "Number of shares purchased normalized (this is raw divided by 1000000)",
+                            "example": 4.995
+                          },
+                          "price": {
+                            "type": "number",
+                            "description": "Price per share",
+                            "example": 0.65
+                          },
                           "tx_hash": {
                             "type": "string",
+                            "description": "Transaction hash of the order",
                             "example": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12"
                           },
                           "title": {
                             "type": "string",
+                            "description": "Market title",
                             "example": "Will Bitcoin be above $50,000 on July 25, 2025 at 8:00 PM ET?"
                           },
                           "timestamp": {
@@ -379,6 +393,7 @@
                           },
                           "order_hash": {
                             "type": "string",
+                            "description": "Hash of the order",
                             "example": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
                           },
                           "user": {
