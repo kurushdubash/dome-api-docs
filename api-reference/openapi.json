@@ -163,6 +163,24 @@
                         "description": "Tuple of [candlestick_data_array, token_metadata]",
                         "minItems": 2,
                         "maxItems": 2,
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "array",
+                              "description": "Candlestick data array",
+                              "items": {
+                                "type": "object"
+                              }
+                            },
+                            {
+                              "type": "object",
+                              "description": "Token metadata",
+                              "properties": {
+                                "token_id": { "type": "string" }
+                              }
+                            }
+                          ]
+                        },
                         "example": [
                           [
                             {
@@ -1346,6 +1364,12 @@
                                   "description": "[price_as_dollar_string, contract_count]",
                                   "minItems": 2,
                                   "maxItems": 2,
+                                  "items": {
+                                    "oneOf": [
+                                      { "type": "string" },
+                                      { "type": "number" }
+                                    ]
+                                  },
                                   "example": ["0.75", 100]
                                 }
                               },
@@ -1357,6 +1381,12 @@
                                   "description": "[price_as_dollar_string, contract_count]",
                                   "minItems": 2,
                                   "maxItems": 2,
+                                  "items": {
+                                    "oneOf": [
+                                      { "type": "string" },
+                                      { "type": "number" }
+                                    ]
+                                  },
                                   "example": ["0.25", 100]
                                 }
                               }
