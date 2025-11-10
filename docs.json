@@ -75,7 +75,9 @@
                 {
                     "group": "Polymarket",
                     "pages": [
-                        "websockets/polymarket-websockets"
+                        "websockets/polymarket-websockets",
+                        "websockets/polymarket-websockets-sdk",
+                        "websockets/polymarket-websockets-python-sdk"
                     ]
                 }
             ]

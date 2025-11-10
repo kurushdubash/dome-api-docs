@@ -1,0 +1,407 @@
+---
+title: "Python SDK"
+description: "Python SDK for Polymarket WebSockets"
+---
+
+## Overview
+
+The Python SDK provides a convenient way to connect to Dome API's Polymarket WebSocket server and handle real-time order data. The SDK manages connection lifecycle, automatic reconnection, and event handling.
+
+## Installation
+
+Install the SDK from PyPI:
+
+```bash
+pip install dome-api-sdk
+```
+
+**Package:** [dome-api-sdk](https://pypi.org/project/dome-api-sdk/)
+
+## Basic Usage
+
+### Importing the SDK
+
+```python
+from dome_api_sdk import DomeClient
+```
+
+### Connecting to the WebSocket
+
+Create a new client instance with your API key:
+
+```python
+dome = DomeClient({"api_key": "YOUR_API_KEY"})
+```
+
+The SDK will automatically connect to `wss://ws.domeapi.io/YOUR_API_KEY` when you access the WebSocket methods.
+
+### Listening for Connection Events
+
+```python
+# The SDK handles connection events internally
+# You can check connection status
+if dome.polymarket.websocket.is_connected():
+    print("Connected to Dome API WebSocket")
+```
+
+## Subscribing to Orders
+
+### Basic Subscription
+
+Subscribe to receive real-time order updates for specific wallet addresses:
+
+```python
+subscription = dome.polymarket.websocket.subscribe({
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "users": [
+            "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+            "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+        ]
+    }
+})
+
+print(f"Subscription ID: {subscription.subscription_id}")
+```
+
+The `subscribe` method returns a subscription acknowledgment containing the `subscription_id`.
+
+### Listening for Order Events
+
+Handle incoming order events using callbacks:
+
+```python
+def handle_order_event(event):
+    print("Order event received:")
+    print(f"Subscription ID: {event.subscription_id}")
+    print(f"Order data: {event.data}")
+    
+    # Access order details
+    order = event.data
+    print(f"{order.user} {order.side} {order.shares_normalized} shares at {order.price} on {order.market_slug}")
+
+# Register the event handler
+dome.polymarket.websocket.on_event(handle_order_event)
+```
+
+### Complete Subscription Example
+
+```python
+from dome_api_sdk import DomeClient
+
+dome = DomeClient({"api_key": "YOUR_API_KEY"})
+
+# Define event handler
+def handle_order(event):
+    order = event.data
+    print(f"New {order.side} order: {order.shares_normalized} shares @ {order.price}")
+    print(f"Market: {order.market_slug}")
+    print(f"User: {order.user}")
+
+# Register event handler
+dome.polymarket.websocket.on_event(handle_order)
+
+# Subscribe to orders
+try:
+    subscription = dome.polymarket.websocket.subscribe({
+        "platform": "polymarket",
+        "version": 1,
+        "type": "orders",
+        "filters": {
+            "users": [
+                "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+                "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+            ]
+        }
+    })
+    
+    print(f"Subscribed with ID: {subscription.subscription_id}")
+except Exception as error:
+    print(f"Subscription failed: {error}")
+```
+
+## Unsubscribing
+
+### Unsubscribe from a Subscription
+
+To stop receiving updates for a specific subscription:
+
+```python
+dome.polymarket.websocket.unsubscribe("sub_gq5c3resmrq")
+```
+
+### Unsubscribe Example
+
+```python
+# Store subscription IDs
+subscriptions = []
+
+# Subscribe and store ID
+sub1 = dome.polymarket.websocket.subscribe({
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "users": ["0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d"]
+    }
+})
+subscriptions.append(sub1.subscription_id)
+
+# Later, unsubscribe
+dome.polymarket.websocket.unsubscribe(subscriptions[0])
+print(f"Unsubscribed from subscription: {subscriptions[0]}")
+```
+
+## Disconnecting
+
+### Manual Disconnect
+
+Disconnect from the WebSocket server:
+
+```python
+dome.polymarket.websocket.disconnect()
+```
+
+When you disconnect, all active subscriptions are automatically cancelled.
+
+### Disconnect Example
+
+```python
+# Do your work
+# ...
+
+# When done, disconnect
+dome.polymarket.websocket.disconnect()
+print("Disconnected from WebSocket")
+```
+
+## Reconnecting
+
+### Automatic Reconnection
+
+The SDK can automatically reconnect when the connection is lost. Configure it when initializing the client:
+
+```python
+dome = DomeClient({
+    "api_key": "YOUR_API_KEY",
+    "websocket": {
+        "auto_reconnect": True,
+        "reconnect_interval": 5,  # 5 seconds
+        "max_reconnect_attempts": 10
+    }
+})
+```
+
+### Manual Reconnection
+
+Manually reconnect after a disconnection:
+
+```python
+# Reconnect
+dome.polymarket.websocket.reconnect()
+print("Reconnected successfully")
+
+# Re-subscribe to your channels
+# Note: You need to re-subscribe after reconnection
+subscription = dome.polymarket.websocket.subscribe({
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "users": ["0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d"]
+    }
+})
+```
+
+### Reconnection with Subscription Restoration
+
+Store your subscription configurations to restore them after reconnection:
+
+```python
+from dome_api_sdk import DomeClient
+
+dome = DomeClient({
+    "api_key": "YOUR_API_KEY",
+    "websocket": {
+        "auto_reconnect": True,
+        "reconnect_interval": 5
+    }
+})
+
+# Store subscription configs
+subscription_configs = [
+    {
+        "platform": "polymarket",
+        "version": 1,
+        "type": "orders",
+        "filters": {
+            "users": [
+                "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+                "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+            ]
+        }
+    }
+]
+
+# Initial subscriptions
+for config in subscription_configs:
+    sub = dome.polymarket.websocket.subscribe(config)
+    print(f"Subscribed: {sub.subscription_id}")
+
+# Define reconnection handler
+def on_reconnect():
+    print("Reconnected, restoring subscriptions...")
+    for config in subscription_configs:
+        sub = dome.polymarket.websocket.subscribe(config)
+        print(f"Restored subscription: {sub.subscription_id}")
+
+dome.polymarket.websocket.on_reconnect(on_reconnect)
+
+# Handle events
+def handle_event(event):
+    print(f"Order event: {event.data}")
+
+dome.polymarket.websocket.on_event(handle_event)
+```
+
+## Complete Example
+
+Here's a complete example that demonstrates all features:
+
+```python
+import signal
+import sys
+from dome_api_sdk import DomeClient
+
+# Initialize client with auto-reconnect
+dome = DomeClient({
+    "api_key": "YOUR_API_KEY",
+    "websocket": {
+        "auto_reconnect": True,
+        "reconnect_interval": 5,
+        "max_reconnect_attempts": 10
+    }
+})
+
+# Track subscriptions
+subscriptions = {}
+
+# Connection handler
+def on_connect():
+    print("✅ Connected to Dome API WebSocket")
+    
+    # Subscribe to orders
+    try:
+        sub = dome.polymarket.websocket.subscribe({
+            "platform": "polymarket",
+            "version": 1,
+            "type": "orders",
+            "filters": {
+                "users": [
+                    "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+                    "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+                ]
+            }
+        })
+        
+        subscriptions[sub.subscription_id] = {
+            "platform": "polymarket",
+            "version": 1,
+            "type": "orders",
+            "filters": {
+                "users": [
+                    "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+                    "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+                ]
+            }
+        }
+        
+        print(f"📡 Subscribed: {sub.subscription_id}")
+    except Exception as error:
+        print(f"❌ Subscription failed: {error}")
+
+def on_error(error):
+    print(f"❌ WebSocket error: {error}")
+
+def on_close():
+    print("🔌 Disconnected from WebSocket")
+
+def on_reconnect():
+    print("🔄 Reconnected, restoring subscriptions...")
+    
+    # Restore all subscriptions
+    for sub_id, config in subscriptions.items():
+        try:
+            sub = dome.polymarket.websocket.subscribe(config)
+            print(f"📡 Restored subscription: {sub.subscription_id}")
+        except Exception as error:
+            print(f"❌ Failed to restore subscription: {error}")
+
+# Register handlers
+dome.polymarket.websocket.on_connect(on_connect)
+dome.polymarket.websocket.on_error(on_error)
+dome.polymarket.websocket.on_close(on_close)
+dome.polymarket.websocket.on_reconnect(on_reconnect)
+
+# Handle order events
+def handle_order_event(event):
+    order = event.data
+    print("\n📦 New Order Event:")
+    print(f"   Subscription: {event.subscription_id}")
+    print(f"   User: {order.user}")
+    print(f"   Side: {order.side}")
+    print(f"   Shares: {order.shares_normalized}")
+    print(f"   Price: {order.price}")
+    print(f"   Market: {order.market_slug}")
+    print(f"   Title: {order.title}")
+    from datetime import datetime
+    print(f"   Timestamp: {datetime.fromtimestamp(order.timestamp).isoformat()}")
+
+dome.polymarket.websocket.on_event(handle_order_event)
+
+# Graceful shutdown
+def signal_handler(sig, frame):
+    print("\n🛑 Shutting down...")
+    
+    # Unsubscribe from all
+    for sub_id in list(subscriptions.keys()):
+        try:
+            dome.polymarket.websocket.unsubscribe(sub_id)
+            print(f"✅ Unsubscribed: {sub_id}")
+        except Exception as error:
+            print(f"❌ Unsubscribe failed: {error}")
+    
+    # Disconnect
+    dome.polymarket.websocket.disconnect()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+# Keep the script running
+try:
+    import time
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    signal_handler(None, None)
+```
+
+## Getting Active Subscriptions
+
+You can check which subscriptions are currently active:
+
+```python
+active_subscriptions = dome.polymarket.websocket.get_active_subscriptions()
+print(f"Active subscriptions: {len(active_subscriptions)}")
+for sub_id in active_subscriptions:
+    print(f"  - {sub_id}")
+```
+
+## Resources
+
+- **PyPI Package:** [dome-api-sdk](https://pypi.org/project/dome-api-sdk/)
+- **GitHub Repository:** [dome-sdk-py](https://github.com/kurushdubash/dome-sdk-py)
+- **API Documentation:** See [Polymarket WebSockets](/websockets/polymarket-websockets) for the raw WebSocket protocol
+

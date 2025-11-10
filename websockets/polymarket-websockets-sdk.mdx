@@ -1,0 +1,398 @@
+---
+title: "TypeScript SDK"
+description: "TypeScript SDK for Polymarket WebSockets"
+---
+
+## Overview
+
+The TypeScript SDK provides a convenient way to connect to Dome API's Polymarket WebSocket server and handle real-time order data. The SDK manages connection lifecycle, automatic reconnection, and event handling.
+
+## Installation
+
+Install the SDK from npm:
+
+```bash
+npm install @dome-api/sdk
+```
+
+**Package:** [@dome-api/sdk](https://www.npmjs.com/package/@dome-api/sdk)
+
+## Basic Usage
+
+### Importing the SDK
+
+```typescript
+import { DomeWebSocket } from '@dome-api/sdk';
+```
+
+### Connecting to the WebSocket
+
+Create a new WebSocket client instance with your API key:
+
+```typescript
+const ws = new DomeWebSocket('YOUR_API_KEY');
+```
+
+The SDK will automatically connect to `wss://ws.domeapi.io/YOUR_API_KEY` when you create the instance.
+
+### Listening for Connection Events
+
+```typescript
+// Listen for connection open
+ws.on('open', () => {
+  console.log('Connected to Dome API WebSocket');
+});
+
+// Listen for connection errors
+ws.on('error', (error) => {
+  console.error('WebSocket error:', error);
+});
+
+// Listen for connection close
+ws.on('close', () => {
+  console.log('Disconnected from Dome API WebSocket');
+});
+```
+
+## Subscribing to Orders
+
+### Basic Subscription
+
+Subscribe to receive real-time order updates for specific wallet addresses:
+
+```typescript
+const subscription = await ws.subscribe({
+  platform: 'polymarket',
+  version: 1,
+  type: 'orders',
+  filters: {
+    users: [
+      '0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d',
+      '0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b'
+    ]
+  }
+});
+
+console.log('Subscription ID:', subscription.subscription_id);
+```
+
+The `subscribe` method returns a promise that resolves with the subscription acknowledgment containing the `subscription_id`.
+
+### Listening for Order Events
+
+Handle incoming order events:
+
+```typescript
+ws.on('event', (event) => {
+  console.log('Order event received:');
+  console.log('Subscription ID:', event.subscription_id);
+  console.log('Order data:', event.data);
+  
+  // Access order details
+  const { token_id, side, market_slug, shares, price, user, timestamp } = event.data;
+  console.log(`${user} ${side} ${shares_normalized} shares at ${price} on ${market_slug}`);
+});
+```
+
+### Complete Subscription Example
+
+```typescript
+import { DomeWebSocket } from '@dome-api/sdk';
+
+const ws = new DomeWebSocket('YOUR_API_KEY');
+
+// Wait for connection
+ws.on('open', async () => {
+  console.log('Connected, subscribing to orders...');
+  
+  try {
+    const subscription = await ws.subscribe({
+      platform: 'polymarket',
+      version: 1,
+      type: 'orders',
+      filters: {
+        users: [
+          '0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d',
+          '0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b'
+        ]
+      }
+    });
+    
+    console.log('Subscribed with ID:', subscription.subscription_id);
+  } catch (error) {
+    console.error('Subscription failed:', error);
+  }
+});
+
+// Handle order events
+ws.on('event', (event) => {
+  const order = event.data;
+  console.log(`New ${order.side} order: ${order.shares_normalized} shares @ ${order.price}`);
+  console.log(`Market: ${order.market_slug}`);
+  console.log(`User: ${order.user}`);
+});
+```
+
+## Unsubscribing
+
+### Unsubscribe from a Subscription
+
+To stop receiving updates for a specific subscription:
+
+```typescript
+await ws.unsubscribe('sub_gq5c3resmrq');
+```
+
+### Unsubscribe Example
+
+```typescript
+// Store subscription IDs
+const subscriptions: string[] = [];
+
+// Subscribe and store ID
+const sub1 = await ws.subscribe({
+  platform: 'polymarket',
+  version: 1,
+  type: 'orders',
+  filters: {
+    users: ['0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d']
+  }
+});
+subscriptions.push(sub1.subscription_id);
+
+// Later, unsubscribe
+await ws.unsubscribe(subscriptions[0]);
+console.log('Unsubscribed from subscription:', subscriptions[0]);
+```
+
+## Disconnecting
+
+### Manual Disconnect
+
+Disconnect from the WebSocket server:
+
+```typescript
+await ws.disconnect();
+```
+
+When you disconnect, all active subscriptions are automatically cancelled.
+
+### Disconnect Example
+
+```typescript
+// Disconnect gracefully
+ws.on('open', async () => {
+  // ... do your work ...
+  
+  // When done, disconnect
+  await ws.disconnect();
+  console.log('Disconnected from WebSocket');
+});
+```
+
+## Reconnecting
+
+### Automatic Reconnection
+
+The SDK can automatically reconnect when the connection is lost. Enable it when creating the client:
+
+```typescript
+const ws = new DomeWebSocket('YOUR_API_KEY', {
+  autoReconnect: true,
+  reconnectInterval: 5000, // 5 seconds
+  maxReconnectAttempts: 10
+});
+```
+
+### Manual Reconnection
+
+Manually reconnect after a disconnection:
+
+```typescript
+ws.on('close', async () => {
+  console.log('Connection closed, reconnecting...');
+  
+  try {
+    await ws.reconnect();
+    console.log('Reconnected successfully');
+    
+    // Re-subscribe to your channels
+    // Note: You need to re-subscribe after reconnection
+    await ws.subscribe({
+      platform: 'polymarket',
+      version: 1,
+      type: 'orders',
+      filters: {
+        users: ['0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d']
+      }
+    });
+  } catch (error) {
+    console.error('Reconnection failed:', error);
+  }
+});
+```
+
+### Reconnection with Subscription Restoration
+
+Store your subscription configurations to restore them after reconnection:
+
+```typescript
+import { DomeWebSocket } from '@dome-api/sdk';
+
+const API_KEY = 'YOUR_API_KEY';
+const ws = new DomeWebSocket(API_KEY, {
+  autoReconnect: true,
+  reconnectInterval: 5000
+});
+
+// Store subscription configs
+const subscriptionConfigs = [
+  {
+    platform: 'polymarket',
+    version: 1,
+    type: 'orders',
+    filters: {
+      users: [
+        '0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d',
+        '0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b'
+      ]
+    }
+  }
+];
+
+// Initial subscriptions
+ws.on('open', async () => {
+  for (const config of subscriptionConfigs) {
+    const sub = await ws.subscribe(config);
+    console.log('Subscribed:', sub.subscription_id);
+  }
+});
+
+// Restore subscriptions on reconnect
+ws.on('reconnect', async () => {
+  console.log('Reconnected, restoring subscriptions...');
+  for (const config of subscriptionConfigs) {
+    const sub = await ws.subscribe(config);
+    console.log('Restored subscription:', sub.subscription_id);
+  }
+});
+
+// Handle events
+ws.on('event', (event) => {
+  console.log('Order event:', event.data);
+});
+```
+
+## Complete Example
+
+Here's a complete example that demonstrates all features:
+
+```typescript
+import { DomeWebSocket } from '@dome-api/sdk';
+
+const ws = new DomeWebSocket('YOUR_API_KEY', {
+  autoReconnect: true,
+  reconnectInterval: 5000,
+  maxReconnectAttempts: 10
+});
+
+// Track subscriptions
+const subscriptions = new Map<string, any>();
+
+// Connection handlers
+ws.on('open', async () => {
+  console.log('✅ Connected to Dome API WebSocket');
+  
+  // Subscribe to orders
+  try {
+    const sub = await ws.subscribe({
+      platform: 'polymarket',
+      version: 1,
+      type: 'orders',
+      filters: {
+        users: [
+          '0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d',
+          '0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b'
+        ]
+      }
+    });
+    
+    subscriptions.set(sub.subscription_id, {
+      platform: 'polymarket',
+      version: 1,
+      type: 'orders',
+      filters: {
+        users: [
+          '0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d',
+          '0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b'
+        ]
+      }
+    });
+    
+    console.log('📡 Subscribed:', sub.subscription_id);
+  } catch (error) {
+    console.error('❌ Subscription failed:', error);
+  }
+});
+
+ws.on('error', (error) => {
+  console.error('❌ WebSocket error:', error);
+});
+
+ws.on('close', () => {
+  console.log('🔌 Disconnected from WebSocket');
+});
+
+ws.on('reconnect', async () => {
+  console.log('🔄 Reconnected, restoring subscriptions...');
+  
+  // Restore all subscriptions
+  for (const [subId, config] of subscriptions.entries()) {
+    try {
+      const sub = await ws.subscribe(config);
+      console.log('📡 Restored subscription:', sub.subscription_id);
+    } catch (error) {
+      console.error('❌ Failed to restore subscription:', error);
+    }
+  }
+});
+
+// Handle order events
+ws.on('event', (event) => {
+  const order = event.data;
+  console.log('\n📦 New Order Event:');
+  console.log(`   Subscription: ${event.subscription_id}`);
+  console.log(`   User: ${order.user}`);
+  console.log(`   Side: ${order.side}`);
+  console.log(`   Shares: ${order.shares_normalized}`);
+  console.log(`   Price: ${order.price}`);
+  console.log(`   Market: ${order.market_slug}`);
+  console.log(`   Title: ${order.title}`);
+  console.log(`   Timestamp: ${new Date(order.timestamp * 1000).toISOString()}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down...');
+  
+  // Unsubscribe from all
+  for (const subId of subscriptions.keys()) {
+    try {
+      await ws.unsubscribe(subId);
+      console.log('✅ Unsubscribed:', subId);
+    } catch (error) {
+      console.error('❌ Unsubscribe failed:', error);
+    }
+  }
+  
+  // Disconnect
+  await ws.disconnect();
+  process.exit(0);
+});
+```
+
+## Resources
+
+- **NPM Package:** [@dome-api/sdk](https://www.npmjs.com/package/@dome-api/sdk)
+- **GitHub Repository:** [dome-sdk-ts](https://github.com/kurushdubash/dome-sdk-ts)
+- **API Documentation:** See [Polymarket WebSockets](/websockets/polymarket-websockets) for the raw WebSocket protocol
