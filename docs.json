@@ -54,12 +54,6 @@
                 "api-reference/openapi.json get /kalshi/markets",
                 "api-reference/openapi.json get /kalshi/orderbooks"
               ]
-            },
-            {
-              "group": "Changelog",
-              "pages": [
-                "changelog/changelog"
-              ]
             }
           ]
         },
@@ -81,6 +75,17 @@
                     ]
                 }
             ]
+        },
+        {
+          "tab": "Changelog",
+          "groups": [
+            {
+              "group": "Changelog",
+              "pages": [
+                "changelog/changelog"
+              ]
+            }
+          ]
         }
       ]
     },
