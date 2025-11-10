@@ -52,6 +52,7 @@
               "group": "Kalshi Endpoints",
               "pages": [
                 "api-reference/openapi.json get /kalshi/markets",
+                "api-reference/openapi.json get /kalshi/trades",
                 "api-reference/openapi.json get /kalshi/orderbooks"
               ]
             }
