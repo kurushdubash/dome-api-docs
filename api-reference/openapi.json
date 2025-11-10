@@ -1101,6 +1101,13 @@
                             "description": "Unix timestamp in seconds when the market was closed",
                             "example": null
                           },
+                          "game_start_time": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true,
+                            "description": "Datetime string in UTC format (YYYY-MM-DD HH:MM:SS.000) for when the game/event starts. Only present for sports markets that have a game start time.",
+                            "example": "2025-08-16 20:00:00.000"
+                          },
                           "tags": {
                             "type": "array",
                             "items": {
