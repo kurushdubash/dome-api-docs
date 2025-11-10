@@ -24,6 +24,7 @@
         "tab": "Guides",
         "groups": [
           {
+<<<<<<< Updated upstream
             "group": "Getting started",
             "pages": [
               "index"
@@ -60,6 +61,66 @@
             "pages": [
               "changelog/changelog"
             ]
+=======
+              "tab": "API",
+              "groups": [
+                  {
+                      "group": "Getting started",
+                      "pages": [
+                          "index"
+                      ]
+                  },
+                  {
+                      "group": "Matching Markets",
+                      "pages": [
+                          "api-reference/endpoint/get-matching-markets-sports",
+                          "api-reference/endpoint/get-matching-markets-sports-sport"
+                      ]
+                  },
+                  {
+                      "group": "Polymarket Endpoints",
+                      "pages": [
+                          "api-reference/endpoint/get-markets",
+                          "api-reference/endpoint/get-trade-history",
+                          "api-reference/endpoint/get-orderbook-history",
+                          "api-reference/endpoint/get-activity",
+                          "api-reference/endpoint/get-market-price",
+                          "api-reference/endpoint/get-candlestick",
+                          "api-reference/endpoint/get-wallet-pnl"
+                      ]
+                  },
+                  {
+                      "group": "Kalshi Endpoints",
+                      "pages": [
+                          "api-reference/endpoint/get-kalshi-markets",
+                          "api-reference/endpoint/get-kalshi-orderbook-history"
+                      ]
+                  },
+                  {
+                    "group": "Changelog",
+                    "pages": [
+                          "changelog/changelog"
+                    ]
+                }
+              ]
+          },
+          {
+              "tab": "websockets",
+              "groups": [
+                  {
+                      "group": "Getting started",
+                      "pages": [
+                          "websockets/index"
+                      ]
+                  },
+                  {
+                      "group": "Polymarket",
+                      "pages": [
+                          "websockets/polymarket-websockets"
+                      ]
+                  }
+              ]
+>>>>>>> Stashed changes
           }
         ]
       }
