@@ -1702,7 +1702,7 @@
         },
         "x-mint": {
           "metadata": {
-            "title": "Trades",
+            "title": "Trade History",
             "description": "Fetches historical trade data for Kalshi markets with optional filtering by **ticker** and time range. Returns executed trades with pricing, volume, and taker side information. All timestamps are in **seconds**."
           },
           "href": "/api-reference/endpoint/get-kalshi-trades"
