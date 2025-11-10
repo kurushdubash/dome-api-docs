@@ -24,6 +24,44 @@
         "tab": "Guides",
         "groups": [
           {
+<<<<<<< Updated upstream
+            "group": "Getting started",
+            "pages": [
+              "index"
+            ]
+          },
+          {
+            "group": "Matching Markets",
+            "pages": [
+              "api-reference/openapi.json get /matching-markets/sports",
+              "api-reference/openapi.json get /matching-markets/sports/{sport}"
+            ]
+          },
+          {
+            "group": "Polymarket Endpoints",
+            "pages": [
+              "api-reference/openapi.json get /polymarket/markets",
+              "api-reference/openapi.json get /polymarket/orders",
+              "api-reference/openapi.json get /polymarket/orderbooks",
+              "api-reference/openapi.json get /polymarket/activity",
+              "api-reference/openapi.json get /polymarket/market-price/{token_id}",
+              "api-reference/openapi.json get /polymarket/candlesticks/{condition_id}",
+              "api-reference/openapi.json get /polymarket/wallet/pnl/{wallet_address}"
+            ]
+          },
+          {
+            "group": "Kalshi Endpoints",
+            "pages": [
+              "api-reference/openapi.json get /kalshi/markets",
+              "api-reference/openapi.json get /kalshi/orderbooks"
+            ]
+          },
+          {
+            "group": "Changelog",
+            "pages": [
+              "changelog/changelog"
+            ]
+=======
               "tab": "API",
               "groups": [
                   {
@@ -82,6 +120,7 @@
                       ]
                   }
               ]
+>>>>>>> Stashed changes
           }
         ]
       }
