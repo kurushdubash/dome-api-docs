@@ -1,0 +1,97 @@
+---
+title: "Websockets"
+description: "Get started with Dome Websockets"
+---
+
+## What is Dome API?
+Dome API provides comprehensive access to prediction market data across multiple platforms including Polymarket and Kalshi. Get real-time market prices, historical candlestick data, wallet analytics, order tracking, and cross-platform market matching.
+
+## What are Websockets?
+
+Dome API provides real-time data streaming through WebSocket connections, allowing you to receive live updates for market prices, trades, orderbook changes, and more without constantly polling the REST API.
+
+## Tier Limits
+
+Subscription and wallet tracking limits vary by tier:
+
+| Tier | Subscriptions | Wallets per Subscription |
+|------|--------------|-------------------------|
+| **Free** | 2 | 5 |
+| **Dev** | 500 | 500 |
+| **Enterprise** | Custom | Custom |
+
+## Quick Start
+
+### 1. Get Your API Key
+
+[Sign up](https://www.domeapi.io/) for an account and get your API Key from the dashboard.
+![Hero Light Pn](/images/hero-light.png)
+
+### 2. Connect to the WebSocket
+
+Connect to the Dome API WebSocket endpoint to start receiving real-time data. Below is an example using `wscat`
+
+`wscat -c wss://ws.domeapi.io/<API_KEY_GOES_HERE>`
+
+
+### 3. Subscribe to Channels
+
+Subscribe to specific channels to receive updates for the data you need.
+
+Example subscription: 
+```json
+{
+    "action": "subscribe",
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "users": [
+            "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d", "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+        ]
+    }
+}
+```
+
+As trades come in, orders that have a user who matches your filter on the users field will be sent you:
+
+Example message recieved:
+```json
+{
+    "type": "event",
+    "subscription_id": "sub_m58zfduokmd",
+    "data":
+    {
+        "token_id": "57564352641769637293436658960633624379577489846300950628596680893489126052038",
+        "side": "BUY",
+        "market_slug": "btc-updown-15m-1762755300",
+        "condition_id": "0x592b8a416cbe36aa7bb40df85a61685ebd54ebbd2d55842f1bb398cae4f40dfc",
+        "shares": 5000000,
+        "shares_normalized": 5,
+        "price": 0.54,
+        "tx_hash": "0xd94d999336c1f579359044e2bc5fba863f240ee07ef1c6713ff69e09b67b3b13",
+        "title": "Bitcoin Up or Down - November 10, 1:15AM-1:30AM ET",
+        "timestamp": 1762755335,
+        "order_hash": "0xf504516ab54ea46f41eaf2852f41c328e6234928f3fcfe01a9172a5908839421",
+        "user": "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d"
+    }
+}
+```
+
+### 4. Unsubscribe to Channels
+To unsubscribe and stop recieving information, you can either disconnect or send an `unsubscribe` action:
+
+Example:
+```json
+{
+    "action": "unsubscribe",
+    "version": 1,
+    "subscription_id": "sub_wjhhq8dny2"
+}
+```
+
+## Need Help?
+
+- Email: [Support Email](mailto:support@domeapi.com)
+- Join our [Discord](https://discord.gg/fKAbjNAbkt) community
+- Check out our SDKs: [TypeScript](https://github.com/kurushdubash/dome-sdk-ts) | [Python](https://github.com/kurushdubash/dome-sdk-py)
