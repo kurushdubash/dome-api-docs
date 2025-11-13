@@ -456,6 +456,141 @@
         }
       }
     },
+    "/polymarket/wallet": {
+      "get": {
+        "operationId": "getWallet",
+        "summary": "Get Wallet",
+        "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type information.",
+        "parameters": [
+          {
+            "name": "eoa",
+            "in": "query",
+            "required": false,
+            "description": "EOA (Externally Owned Account) wallet address. Either `eoa` or `proxy` must be provided, but not both.",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "example": "0xe9a69b28ffd86f6ea0c5d8171c95537479b84a29"
+            }
+          },
+          {
+            "name": "proxy",
+            "in": "query",
+            "required": false,
+            "description": "Proxy wallet address. Either `eoa` or `proxy` must be provided, but not both.",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "example": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wallet information response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "eoa": {
+                      "type": "string",
+                      "description": "The EOA (Externally Owned Account) wallet address",
+                      "example": "0xe9a69b28ffd86f6ea0c5d8171c95537479b84a29"
+                    },
+                    "proxy": {
+                      "type": "string",
+                      "description": "The proxy wallet address",
+                      "example": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d"
+                    },
+                    "wallet_type": {
+                      "type": "string",
+                      "description": "The type of wallet",
+                      "example": "safe"
+                    }
+                  },
+                  "required": [
+                    "eoa",
+                    "proxy",
+                    "wallet_type"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid or missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "BAD_REQUEST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Either eoa or proxy parameter must be provided, but not both"
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_parameter": {
+                    "summary": "Missing required parameter",
+                    "value": {
+                      "error": "BAD_REQUEST",
+                      "message": "Either eoa or proxy parameter must be provided"
+                    }
+                  },
+                  "both_parameters": {
+                    "summary": "Both parameters provided",
+                    "value": {
+                      "error": "BAD_REQUEST",
+                      "message": "Only one of eoa or proxy can be provided, not both"
+                    }
+                  },
+                  "invalid_address": {
+                    "summary": "Invalid wallet address format",
+                    "value": {
+                      "error": "BAD_REQUEST",
+                      "message": "Invalid wallet address format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Wallet not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "NOT_FOUND"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Wallet not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Wallet",
+            "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type."
+          },
+          "href": "/api-reference/endpoint/get-wallet"
+        }
+      }
+    },
     "/polymarket/orders": {
       "get": {
         "operationId": "getOrders",
