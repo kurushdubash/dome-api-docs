@@ -700,6 +700,11 @@
                             "type": "string",
                             "example": "58519484510520807142687824915233722607092670035910114837910294451210534222702"
                           },
+                          "token_label": {
+                            "type": "string",
+                            "description": "Human readable label for this outcome (yes/no etc)",
+                            "example": "Yes"
+                          },
                           "side": {
                             "type": "string",
                             "enum": [
@@ -755,6 +760,11 @@
                             "type": "string",
                             "description": "Maker address of the order",
                             "example": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+                          },
+                          "taker": {
+                            "type": "string",
+                            "description": "Taker address that was part of this trade. Note: This can often be the CTF exchange and is not always the true taker, proceed with caution using taker information",
+                            "example": "0x8d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e"
                           }
                         }
                       }
