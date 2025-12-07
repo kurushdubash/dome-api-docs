@@ -1197,6 +1197,26 @@
               "default": 0,
               "example": 0
             }
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets from this Unix timestamp in seconds (inclusive)",
+            "schema": {
+              "type": "integer",
+              "example": 1640995200
+            }
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets until this Unix timestamp in seconds (inclusive)",
+            "schema": {
+              "type": "integer",
+              "example": 1672531200
+            }
           }
         ],
         "responses": {
