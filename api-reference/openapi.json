@@ -595,7 +595,7 @@
       "get": {
         "operationId": "getOrders",
         "summary": "Get Orders",
-        "description": "Fetches order data with optional filtering by market, condition, token, time range, and user. Returns orders that match either primary or secondary token IDs for markets. At least one of market_slug, condition_id, user, or token_id must be provided. Only one of market_slug, token_id, or condition_id can be provided.",
+        "description": "Fetches order data with optional filtering by market, condition, token, time range, and user. Returns orders that match either primary or secondary token IDs for markets. If no filters provided, fetches the latest trades happening in real-time. Only one of market_slug, token_id, or condition_id can be provided.",
         "parameters": [
           {
             "name": "market_slug",
