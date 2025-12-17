@@ -16,9 +16,9 @@
     },
     "api": {
         "playground": {
-            "display": "interactive"
-        },
-        "proxy": false
+            "display": "interactive",
+            "proxy": false
+        }
     },
     "navigation": {
         "global": {
