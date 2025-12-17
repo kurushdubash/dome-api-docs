@@ -496,7 +496,7 @@
             }
           },
           {
-            "name": "start",
+            "name": "start_time",
             "in": "query",
             "required": false,
             "description": "Optional start date for metrics calculation (Unix timestamp in seconds). Only used when `with_metrics=true`.",
@@ -506,7 +506,7 @@
             }
           },
           {
-            "name": "end",
+            "name": "end_time",
             "in": "query",
             "required": false,
             "description": "Optional end date for metrics calculation (Unix timestamp in seconds). Only used when `with_metrics=true`.",
