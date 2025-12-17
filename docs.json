@@ -9,6 +9,12 @@
       "dark": "#6c28d9"
     },
     "favicon": "/favicon.ico",
+    "seo": {
+      "metatags": {
+          "canonical": "https://docs.domeapi.io/"
+      }
+    },
+    "proxy": false,
     "navigation": {
       "global": {
         "anchors": [
