@@ -460,7 +460,7 @@
       "get": {
         "operationId": "getWallet",
         "summary": "Get Wallet",
-        "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type information.",
+        "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type information. Optionally returns trading metrics when `with_metrics=true`.",
         "parameters": [
           {
             "name": "eoa",
@@ -482,6 +482,37 @@
               "type": "string",
               "pattern": "^0x[0-9a-fA-F]{40}$",
               "example": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d"
+            }
+          },
+          {
+            "name": "with_metrics",
+            "in": "query",
+            "required": false,
+            "description": "Whether to include wallet trading metrics (total volume, trades, and markets). Pass `true` to include metrics. Metrics are computed only when explicitly requested for performance reasons.",
+            "schema": {
+              "type": "string",
+              "enum": ["true", "false"],
+              "example": "true"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "description": "Optional start date for metrics calculation (Unix timestamp in seconds). Only used when `with_metrics=true`.",
+            "schema": {
+              "type": "integer",
+              "example": 1640995200
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": false,
+            "description": "Optional end date for metrics calculation (Unix timestamp in seconds). Only used when `with_metrics=true`.",
+            "schema": {
+              "type": "integer",
+              "example": 1672531200
             }
           }
         ],
@@ -507,6 +538,27 @@
                       "type": "string",
                       "description": "The type of wallet",
                       "example": "safe"
+                    },
+                    "wallet_metrics": {
+                      "type": "object",
+                      "description": "Trading metrics for this wallet (only present when with_metrics=true)",
+                      "properties": {
+                        "total_volume": {
+                          "type": "number",
+                          "description": "Total trading volume in USD",
+                          "example": 150000.50
+                        },
+                        "total_trades": {
+                          "type": "number",
+                          "description": "Total number of trades (orders where this wallet was the maker)",
+                          "example": 450
+                        },
+                        "total_markets": {
+                          "type": "number",
+                          "description": "Total number of unique markets traded in",
+                          "example": 25
+                        }
+                      }
                     }
                   },
                   "required": [
@@ -514,6 +566,31 @@
                     "proxy",
                     "wallet_type"
                   ]
+                },
+                "examples": {
+                  "without_metrics": {
+                    "summary": "Basic wallet information",
+                    "description": "Response when with_metrics is not provided or false",
+                    "value": {
+                      "eoa": "0xe9a69b28ffd86f6ea0c5d8171c95537479b84a29",
+                      "proxy": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d",
+                      "wallet_type": "safe"
+                    }
+                  },
+                  "with_metrics": {
+                    "summary": "Wallet information with metrics",
+                    "description": "Response when with_metrics=true",
+                    "value": {
+                      "eoa": "0xe9a69b28ffd86f6ea0c5d8171c95537479b84a29",
+                      "proxy": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d",
+                      "wallet_type": "safe",
+                      "wallet_metrics": {
+                        "total_volume": 150000.50,
+                        "total_trades": 450,
+                        "total_markets": 25
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -585,7 +662,7 @@
         "x-mint": {
           "metadata": {
             "title": "Wallet",
-            "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type."
+            "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type. Optionally returns trading metrics including total volume, number of trades, and unique markets traded when `with_metrics=true`."
           },
           "href": "/api-reference/endpoint/get-wallet"
         }
