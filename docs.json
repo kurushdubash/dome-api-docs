@@ -4,140 +4,151 @@
     "name": "Dome API",
     "openapi": "api-reference/openapi.json",
     "colors": {
-      "primary": "#6c28d9",
-      "light": "#a675eb",
-      "dark": "#6c28d9"
+        "primary": "#6c28d9",
+        "light": "#a675eb",
+        "dark": "#6c28d9"
     },
     "favicon": "/favicon.ico",
+    "seo": {
+        "metatags": {
+            "canonical": "https://docs.domeapi.io/"
+        }
+    },
+    "api": {
+        "playground": {
+            "display": "interactive",
+            "proxy": false
+        }
+    },
     "navigation": {
-      "global": {
-        "anchors": [
-          {
-            "anchor": "Discord",
-            "icon": "discord",
-            "href": "https://discord.gg/fKAbjNAbkt"
-          }
-        ]
-      },
-      "tabs": [
-        {
-          "tab": "API",
-          "groups": [
-            {
-              "group": "Getting started",
-              "pages": [
-                "index"
-              ]
-            },
-            {
-              "group": "Matching Markets",
-              "pages": [
-                "api-reference/openapi.json get /matching-markets/sports",
-                "api-reference/openapi.json get /matching-markets/sports/{sport}"
-              ]
-            },
-            {
-              "group": "Polymarket Endpoints",
-              "pages": [
-                "api-reference/openapi.json get /polymarket/markets",
-                "api-reference/openapi.json get /polymarket/orders",
-                "api-reference/openapi.json get /polymarket/orderbooks",
-                "api-reference/openapi.json get /polymarket/activity",
-                "api-reference/openapi.json get /polymarket/market-price/{token_id}",
-                "api-reference/openapi.json get /polymarket/candlesticks/{condition_id}",
-                "api-reference/openapi.json get /polymarket/wallet",
-                "api-reference/openapi.json get /polymarket/wallet/pnl/{wallet_address}"
-              ]
-            },
-            {
-              "group": "Kalshi Endpoints",
-              "pages": [
-                "api-reference/openapi.json get /kalshi/markets",
-                "api-reference/openapi.json get /kalshi/trades",
-                "api-reference/openapi.json get /kalshi/orderbooks"
-              ]
-            }
-          ]
-        },
-        {
-            "tab": "Websockets",
-            "groups": [
+        "global": {
+            "anchors": [
                 {
-                    "group": "Getting started",
-                    "pages": [
-                        "websockets/index"
-                    ]
-                },
-                {
-                    "group": "Polymarket",
-                    "pages": [
-                        "websockets/polymarket-websockets",
-                        "websockets/polymarket-websockets-sdk",
-                        "websockets/polymarket-websockets-python-sdk"
-                    ]
+                    "anchor": "Discord",
+                    "icon": "discord",
+                    "href": "https://discord.gg/fKAbjNAbkt"
                 }
             ]
         },
-        {
-          "tab": "Changelog",
-          "groups": [
+        "tabs": [
             {
-              "group": "Changelog",
-              "pages": [
-                "changelog/changelog"
-              ]
+                "tab": "API",
+                "groups": [
+                    {
+                        "group": "Getting started",
+                        "pages": [
+                            "index"
+                        ]
+                    },
+                    {
+                        "group": "Matching Markets",
+                        "pages": [
+                            "api-reference/openapi.json get /matching-markets/sports",
+                            "api-reference/openapi.json get /matching-markets/sports/{sport}"
+                        ]
+                    },
+                    {
+                        "group": "Polymarket Endpoints",
+                        "pages": [
+                            "api-reference/openapi.json get /polymarket/markets",
+                            "api-reference/openapi.json get /polymarket/orders",
+                            "api-reference/openapi.json get /polymarket/orderbooks",
+                            "api-reference/openapi.json get /polymarket/activity",
+                            "api-reference/openapi.json get /polymarket/market-price/{token_id}",
+                            "api-reference/openapi.json get /polymarket/candlesticks/{condition_id}",
+                            "api-reference/openapi.json get /polymarket/wallet",
+                            "api-reference/openapi.json get /polymarket/wallet/pnl/{wallet_address}"
+                        ]
+                    },
+                    {
+                        "group": "Kalshi Endpoints",
+                        "pages": [
+                            "api-reference/openapi.json get /kalshi/markets",
+                            "api-reference/openapi.json get /kalshi/trades",
+                            "api-reference/openapi.json get /kalshi/orderbooks"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Websockets",
+                "groups": [
+                    {
+                        "group": "Getting started",
+                        "pages": [
+                            "websockets/index"
+                        ]
+                    },
+                    {
+                        "group": "Polymarket",
+                        "pages": [
+                            "websockets/polymarket-websockets",
+                            "websockets/polymarket-websockets-sdk",
+                            "websockets/polymarket-websockets-python-sdk"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Changelog",
+                "groups": [
+                    {
+                        "group": "Changelog",
+                        "pages": [
+                            "changelog/changelog"
+                        ]
+                    }
+                ]
             }
-          ]
-        }
-      ]
+        ]
     },
     "logo": {
-      "light": "/logo/light.svg",
-      "dark": "/logo/dark.svg"
+        "light": "/logo/light.svg",
+        "dark": "/logo/dark.svg"
     },
     "navbar": {
-      "links": [
-        {
-          "label": "Support",
-          "href": "mailto:support@domeapi.com"
+        "links": [
+            {
+                "label": "Support",
+                "href": "mailto:support@domeapi.com"
+            }
+        ],
+        "primary": {
+            "type": "button",
+            "label": "Dashboard",
+            "href": "https://domeapi.io"
         }
-      ],
-      "primary": {
-        "type": "button",
-        "label": "Dashboard",
-        "href": "https://domeapi.io"
-      }
     },
     "contextual": {
-      "options": [
-        "copy",
-        "view",
-        "chatgpt",
-        "claude",
-        "perplexity",
-        "mcp",
-        "cursor",
-        "vscode"
-      ]
+        "options": [
+            "copy",
+            "view",
+            "chatgpt",
+            "claude",
+            "perplexity",
+            "mcp",
+            "cursor",
+            "vscode"
+        ]
     },
     "footer": {
-      "socials": {
-        "x": "https://x.com/getdomeapi",
-        "github": "https://github.com/kurushdubash/dome-sdk-ts"
-      }
+        "socials": {
+            "x": "https://x.com/getdomeapi",
+            "github": "https://github.com/kurushdubash/dome-sdk-ts"
+        }
     },
     "redirects": [
-      {
-        "source": "/api-reference/endpoint/get-order-history",
-        "destination": "/api-reference/endpoint/get-trade-history"
-      }
+        {
+            "source": "/api-reference/endpoint/get-order-history",
+            "destination": "/api-reference/endpoint/get-trade-history"
+        }
     ],
     "integrations": {
-      "ga4": {
-          "measurementId": "G-DH0267YKWV"
-      },    
-      "heap": {
-        "appId": "2952780669"
-      }
+        "ga4": {
+            "measurementId": "G-DH0267YKWV"
+        },
+        "heap": {
+            "appId": "2952780669"
+        }
     }
-  }
+}
