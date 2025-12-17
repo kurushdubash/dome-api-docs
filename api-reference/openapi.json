@@ -557,6 +557,24 @@
                           "type": "number",
                           "description": "Total number of unique markets traded in",
                           "example": 25
+                        },
+                        "highest_volume_day": {
+                          "type": "object",
+                          "description": "The day with the highest number of shares traded",
+                          "properties": {
+                            "date": {
+                              "type": "string",
+                              "format": "date",
+                              "description": "Date in YYYY-MM-DD format",
+                              "example": "2025-10-12"
+                            },
+                            "volume": {
+                              "type": "number",
+                              "description": "Total shares traded on that day (normalized, divided by 1,000,000)",
+                              "example": 25000.75
+                            }
+                          },
+                          "required": ["date", "volume"]
                         }
                       }
                     }
@@ -587,7 +605,11 @@
                       "wallet_metrics": {
                         "total_volume": 150000.50,
                         "total_trades": 450,
-                        "total_markets": 25
+                        "total_markets": 25,
+                        "highest_volume_day": {
+                          "date": "2025-10-12",
+                          "volume": 25000.75
+                        }
                       }
                     }
                   }
