@@ -14,7 +14,11 @@
           "canonical": "https://docs.domeapi.io/"
       }
     },
-    "proxy": false,
+    "api": {
+      "playground": {
+        "proxy": false,
+      }
+    },
     "navigation": {
       "global": {
         "anchors": [
