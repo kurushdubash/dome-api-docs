@@ -1,0 +1,102 @@
+---
+title: "Subscribe - Market Slug Filters"
+description: "Subscribe to orders filtered by market slugs"
+---
+
+## Overview
+
+Filter orders by market slugs to track all trades within specific markets. Market slugs are unique identifiers for each market on Polymarket.
+
+## Subscription Format
+
+```json
+{
+    "action": "subscribe",
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "market_slugs": [
+            "btc-updown-15m-1762755300"
+        ]
+    }
+}
+```
+
+## Parameters
+
+- `action`: Must be `"subscribe"`
+- `platform`: Must be `"polymarket"`
+- `version`: Currently `1`
+- `type`: Must be `"orders"`
+- `filters.market_slugs`: Array of market slug strings
+
+## Multiple Market Slugs
+
+You can track multiple markets in a single subscription:
+
+```json
+{
+    "action": "subscribe",
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "market_slugs": [
+            "btc-updown-15m-1762755300",
+            "eth-price-2024-12-31"
+        ]
+    }
+}
+```
+
+You'll receive order events when trades occur in any of the specified markets.
+
+## Example Response
+
+When an order matching your filter is executed, you'll receive:
+
+```json
+{
+    "type": "event",
+    "subscription_id": "sub_m58zfduokmd",
+    "data": {
+        "token_id": "57564352641769637293436658960633624379577489846300950628596680893489126052038",
+        "side": "BUY",
+        "market_slug": "btc-updown-15m-1762755300",
+        "condition_id": "0x592b8a416cbe36aa7bb40df85a61685ebd54ebbd2d55842f1bb398cae4f40dfc",
+        "shares": 5000000,
+        "shares_normalized": 5,
+        "price": 0.54,
+        "tx_hash": "0xd94d999336c1f579359044e2bc5fba863f240ee07ef1c6713ff69e09b67b3b13",
+        "title": "Bitcoin Up or Down - November 10, 1:15AM-1:30AM ET",
+        "timestamp": 1762755335,
+        "order_hash": "0xf504516ab54ea46f41eaf2852f41c328e6234928f3fcfe01a9172a5908839421",
+        "user": "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d"
+    }
+}
+```
+
+The `market_slug` field in the response will match one of the market slugs from your subscription filter.
+
+## Finding Market Slugs
+
+Market slugs can be found:
+- In the URL of Polymarket market pages
+- From the [Markets API endpoint](/api-reference/endpoint/get-markets) response
+- In order event data from other subscriptions
+
+## Use Cases
+
+- Monitor all trading activity within specific markets
+- Track market-wide order flow
+- Build market-specific analytics
+- Create alerts for trades in particular markets
+
+## Related
+
+- [Subscribe Overview](/websockets/subscribe)
+- [Filter by Users](/websockets/subscribe-users)
+- [Filter by Condition IDs](/websockets/subscribe-condition-ids)
+- [Update Subscription](/websockets/update)
+- [Unsubscribe](/websockets/unsubscribe)

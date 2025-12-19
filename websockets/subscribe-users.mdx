@@ -1,0 +1,111 @@
+---
+title: "Subscribe - User Filters"
+description: "Subscribe to orders filtered by wallet addresses"
+---
+
+## Overview
+
+Filter orders by specific wallet addresses to track trades from particular users. You can also use a wildcard to receive all trades (Dev tier only).
+
+## Subscription Format
+
+```json
+{
+    "action": "subscribe",
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "users": [
+            "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+            "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+        ]
+    }
+}
+```
+
+## Filter Options
+
+### Specific Wallet Addresses
+
+Provide an array of wallet addresses to track:
+
+```json
+{
+    "action": "subscribe",
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "users": [
+            "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+            "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+        ]
+    }
+}
+```
+
+You'll receive order events when any of the specified wallet addresses execute trades.
+
+### Wildcard - All Trades
+
+<Warning>
+The wildcard option (`"*"`) is only available on **Dev tier** and above due to high egress costs. Free tier users cannot use this feature.
+</Warning>
+
+To receive all trades across Polymarket, use a wildcard:
+
+```json
+{
+    "action": "subscribe",
+    "platform": "polymarket",
+    "version": 1,
+    "type": "orders",
+    "filters": {
+        "users": ["*"]
+    }
+}
+```
+
+This will stream all order events from Polymarket. **Note:** This feature requires a Dev tier subscription or higher.
+
+## Example Response
+
+When an order matching your filter is executed, you'll receive:
+
+```json
+{
+    "type": "event",
+    "subscription_id": "sub_m58zfduokmd",
+    "data": {
+        "token_id": "57564352641769637293436658960633624379577489846300950628596680893489126052038",
+        "side": "BUY",
+        "market_slug": "btc-updown-15m-1762755300",
+        "condition_id": "0x592b8a416cbe36aa7bb40df85a61685ebd54ebbd2d55842f1bb398cae4f40dfc",
+        "shares": 5000000,
+        "shares_normalized": 5,
+        "price": 0.54,
+        "tx_hash": "0xd94d999336c1f579359044e2bc5fba863f240ee07ef1c6713ff69e09b67b3b13",
+        "title": "Bitcoin Up or Down - November 10, 1:15AM-1:30AM ET",
+        "timestamp": 1762755335,
+        "order_hash": "0xf504516ab54ea46f41eaf2852f41c328e6234928f3fcfe01a9172a5908839421",
+        "user": "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d"
+    }
+}
+```
+
+## Tier Limits
+
+| Tier | Wallets per Subscription |
+|------|-------------------------|
+| **Free** | 5 |
+| **Dev** | 500 |
+| **Enterprise** | Custom |
+
+## Related
+
+- [Subscribe Overview](/websockets/subscribe)
+- [Filter by Condition IDs](/websockets/subscribe-condition-ids)
+- [Filter by Market Slugs](/websockets/subscribe-market-slugs)
+- [Update Subscription](/websockets/update)
+- [Unsubscribe](/websockets/unsubscribe)

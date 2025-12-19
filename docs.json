@@ -83,6 +83,14 @@
                         "group": "Polymarket",
                         "pages": [
                             "websockets/polymarket-websockets",
+                            "websockets/subscribe",
+                            "websockets/update",
+                            "websockets/unsubscribe"
+                        ]
+                    },
+                    {
+                        "group": "SDKs",
+                        "pages": [
                             "websockets/polymarket-websockets-sdk",
                             "websockets/polymarket-websockets-python-sdk"
                         ]
