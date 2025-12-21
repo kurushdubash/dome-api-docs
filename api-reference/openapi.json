@@ -3193,7 +3193,7 @@
         },
         "x-mint": {
           "metadata": {
-            "title": "Binance Crypto Prices",
+            "title": "Binance Prices",
             "description": "Fetches historical crypto price data from Binance. Returns price data for a specific currency pair over an optional time range. When no time range is provided, returns the most recent price. All timestamps are in Unix milliseconds. Currency format: lowercase alphanumeric with no separators (e.g., btcusdt, ethusdt)."
           },
           "href": "/api-reference/endpoint/get-binance-crypto-prices"
@@ -3492,7 +3492,7 @@
         },
         "x-mint": {
           "metadata": {
-            "title": "Chainlink Crypto Prices",
+            "title": "Chainlink Prices",
             "description": "Fetches historical crypto price data from Chainlink. Returns price data for a specific currency pair over an optional time range. When no time range is provided, returns the most recent price. All timestamps are in Unix milliseconds. Currency format: slash-separated (e.g., btc/usd, eth/usd)."
           },
           "href": "/api-reference/endpoint/get-chainlink-crypto-prices"
