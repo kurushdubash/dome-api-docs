@@ -48,13 +48,6 @@
                         ]
                     },
                     {
-                        "group": "Crypto Prices",
-                        "pages": [
-                            "api-reference/openapi.json get /crypto-prices/binance",
-                            "api-reference/openapi.json get /crypto-prices/chainlink"
-                        ]
-                    },
-                    {
                         "group": "Polymarket Endpoints",
                         "pages": [
                             "api-reference/openapi.json get /polymarket/markets",
