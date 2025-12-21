@@ -580,6 +580,26 @@
                             }
                           },
                           "required": ["date", "volume", "trades"]
+                        },
+                        "merges": {
+                          "type": "number",
+                          "description": "Total number of token merges performed by this wallet",
+                          "example": 262
+                        },
+                        "splits": {
+                          "type": "number",
+                          "description": "Total number of token splits performed by this wallet",
+                          "example": 31
+                        },
+                        "conversions": {
+                          "type": "number",
+                          "description": "Total number of token conversions performed by this wallet",
+                          "example": 4
+                        },
+                        "redemptions": {
+                          "type": "number",
+                          "description": "Total number of token redemptions performed by this wallet",
+                          "example": 2338
                         }
                       }
                     }
@@ -2704,7 +2724,7 @@
           "name": "sport",
           "in": "path",
           "required": true,
-          "description": "The sport to find matching markets for",
+          "description": "The sport to find matching markets for.\n\nSport abbreviations:\n- nfl = Football\n- mlb = Baseball\n- cfb = College Football\n- nba = Basketball\n- nhl = Hockey\n- cbb = College Basketball",
           "schema": {
             "type": "string",
             "enum": [
@@ -2712,7 +2732,8 @@
               "mlb",
               "cfb",
               "nba",
-              "nhl"
+              "nhl",
+              "cbb"
             ],
             "example": "nfl"
           }
