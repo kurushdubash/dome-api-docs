@@ -41,20 +41,6 @@
                         ]
                     },
                     {
-                        "group": "Matching Markets",
-                        "pages": [
-                            "api-reference/openapi.json get /matching-markets/sports",
-                            "api-reference/openapi.json get /matching-markets/sports/{sport}"
-                        ]
-                    },
-                    {
-                        "group": "Crypto Prices",
-                        "pages": [
-                            "api-reference/openapi.json get /crypto-prices/binance",
-                            "api-reference/openapi.json get /crypto-prices/chainlink"
-                        ]
-                    },
-                    {
                         "group": "Polymarket Endpoints",
                         "pages": [
                             "api-reference/openapi.json get /polymarket/markets",
@@ -73,6 +59,20 @@
                             "api-reference/openapi.json get /kalshi/markets",
                             "api-reference/openapi.json get /kalshi/trades",
                             "api-reference/openapi.json get /kalshi/orderbooks"
+                        ]
+                    },
+                    {
+                        "group": "Matching Markets",
+                        "pages": [
+                            "api-reference/openapi.json get /matching-markets/sports",
+                            "api-reference/openapi.json get /matching-markets/sports/{sport}"
+                        ]
+                    },
+                    {
+                        "group": "Crypto Prices",
+                        "pages": [
+                            "api-reference/openapi.json get /crypto-prices/binance",
+                            "api-reference/openapi.json get /crypto-prices/chainlink"
                         ]
                     }
                 ]

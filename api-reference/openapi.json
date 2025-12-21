@@ -2711,7 +2711,7 @@
         },
         "x-mint": {
           "metadata": {
-            "title": "Matching Markets for Sports",
+            "title": "Sports",
             "description": "Find equivalent markets across different prediction market platforms (Polymarket, Kalshi, etc.) for sports events using a Polymarket market slug or a Kalshi event ticker."
           },
           "href": "/api-reference/endpoint/get-matching-markets-sports"
