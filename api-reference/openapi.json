@@ -1275,6 +1275,16 @@
             "explode": true
           },
           {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search markets by keywords in title and description. Must be URL encoded (e.g., 'bitcoin%20price' for 'bitcoin price').",
+            "schema": {
+              "type": "string",
+              "example": "bitcoin"
+            }
+          },
+          {
             "name": "status",
             "in": "query",
             "required": false,
@@ -1639,6 +1649,16 @@
             },
             "style": "form",
             "explode": true
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search markets by keywords in title and description. Must be URL encoded (e.g., 'bitcoin%20price' for 'bitcoin price').",
+            "schema": {
+              "type": "string",
+              "example": "bitcoin"
+            }
           },
           {
             "name": "status",
