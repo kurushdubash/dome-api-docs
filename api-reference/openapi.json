@@ -1000,7 +1000,7 @@
       "get": {
         "operationId": "getOrderbooks",
         "summary": "Get Orderbook History",
-        "description": "Fetches historical orderbook snapshots for a specific asset (token ID) over a specified time range. Returns snapshots of the order book including bids, asks, and market metadata in order. All timestamps are in milliseconds. Orderbook data has history starting from October 14th, 2025.",
+        "description": "Fetches historical orderbook snapshots for a specific asset (token ID) over a specified time range. If no start_time and end_time are provided, returns the latest orderbook snapshot for the market. Returns snapshots of the order book including bids, asks, and market metadata in order. All timestamps are in milliseconds. Orderbook data has history starting from October 14th, 2025. Note: When fetching the latest orderbook (without start/end times), the limit and pagination_key parameters are ignored.",
         "parameters": [
           {
             "name": "token_id",
@@ -1015,8 +1015,8 @@
           {
             "name": "start_time",
             "in": "query",
-            "required": true,
-            "description": "Start time in Unix timestamp (milliseconds)",
+            "required": false,
+            "description": "Start time in Unix timestamp (milliseconds). Optional - if not provided along with end_time, returns the latest orderbook snapshot.",
             "schema": {
               "type": "integer",
               "example": 1760470000000
@@ -1025,8 +1025,8 @@
           {
             "name": "end_time",
             "in": "query",
-            "required": true,
-            "description": "End time in Unix timestamp (milliseconds)",
+            "required": false,
+            "description": "End time in Unix timestamp (milliseconds). Optional - if not provided along with start_time, returns the latest orderbook snapshot.",
             "schema": {
               "type": "integer",
               "example": 1760480000000
@@ -1036,7 +1036,7 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "Maximum number of snapshots to return (default: 100, max: 200)",
+            "description": "Maximum number of snapshots to return (default: 100, max: 200). Ignored when fetching the latest orderbook without start_time and end_time.",
             "schema": {
               "type": "integer",
               "default": 100,
@@ -1048,7 +1048,7 @@
             "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "pagination key to get the next chunk of data",
+            "description": "Pagination key to get the next chunk of data. Ignored when fetching the latest orderbook without start_time and end_time.",
             "schema": {
               "type": "string",
               "example": "eyJhc3NldElkIjoiMTM1ODUxMjc2NDY0NTMxMDM0ODcyMjY1MTg3ODYyNjk5NjE0MDAyMjI5NzA0NzI3MzgxMTIwOTU1NDY0MDc5MTY4NDcxMTIyNzE2NjQiLCJ0aW1lc3RhbXAiOjE3NjExMDQwOTg5MTR9"
@@ -1193,7 +1193,7 @@
         "x-mint": {
           "metadata": {
             "title": "Orderbook History",
-            "description": "Fetches historical orderbook snapshots for a specific asset (**token ID**) over a specified time range. Returns snapshots of the order book including bids, asks, and market metadata in order. All timestamps are in **milliseconds**. Orderbook data has history starting from **October 14th, 2025**."
+            "description": "Fetches historical orderbook snapshots for a specific asset (**token ID**) over a specified time range. If no **start_time** and **end_time** are provided, returns the latest orderbook snapshot for the market. Returns snapshots of the order book including bids, asks, and market metadata in order. All timestamps are in **milliseconds**. Orderbook data has history starting from **October 14th, 2025**. **Note:** When fetching the latest orderbook (without start/end times), the limit and pagination_key parameters are ignored."
           },
           "href": "/api-reference/endpoint/get-orderbook-history"
         }
@@ -2030,7 +2030,7 @@
       "get": {
         "operationId": "getKalshiOrderbooks",
         "summary": "Get Kalshi Orderbook History",
-        "description": "Fetches historical orderbook snapshots for a specific Kalshi market (ticker) over a specified time range. Returns snapshots of the order book including yes/no bids and asks with prices in both cents and dollars. All timestamps are in milliseconds. Orderbook data has history starting from October 29th, 2025.",
+        "description": "Fetches historical orderbook snapshots for a specific Kalshi market (ticker) over a specified time range. If no start_time and end_time are provided, returns the latest orderbook snapshot for the market. Returns snapshots of the order book including yes/no bids and asks with prices in both cents and dollars. All timestamps are in milliseconds. Orderbook data has history starting from October 29th, 2025. Note: When fetching the latest orderbook (without start/end times), the limit parameter is ignored.",
         "parameters": [
           {
             "name": "ticker",
@@ -2045,8 +2045,8 @@
           {
             "name": "start_time",
             "in": "query",
-            "required": true,
-            "description": "Start time in Unix timestamp (milliseconds)",
+            "required": false,
+            "description": "Start time in Unix timestamp (milliseconds). Optional - if not provided along with end_time, returns the latest orderbook snapshot.",
             "schema": {
               "type": "integer",
               "example": 1760470000000
@@ -2055,8 +2055,8 @@
           {
             "name": "end_time",
             "in": "query",
-            "required": true,
-            "description": "End time in Unix timestamp (milliseconds)",
+            "required": false,
+            "description": "End time in Unix timestamp (milliseconds). Optional - if not provided along with start_time, returns the latest orderbook snapshot.",
             "schema": {
               "type": "integer",
               "example": 1760480000000
@@ -2066,7 +2066,7 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "description": "Maximum number of snapshots to return (default: 100, max: 200)",
+            "description": "Maximum number of snapshots to return (default: 100, max: 200). Ignored when fetching the latest orderbook without start_time and end_time.",
             "schema": {
               "type": "integer",
               "default": 100,
@@ -2237,7 +2237,7 @@
         "x-mint": {
           "metadata": {
             "title": "Orderbook History",
-            "description": "Fetches historical orderbook snapshots for a specific Kalshi market (**ticker**) over a specified time range. Returns snapshots of the order book including yes/no bids and asks with prices in both cents and dollars. All timestamps are in **milliseconds**. Orderbook data has history starting from **October 29th, 2025**."
+            "description": "Fetches historical orderbook snapshots for a specific Kalshi market (**ticker**) over a specified time range. If no **start_time** and **end_time** are provided, returns the latest orderbook snapshot for the market. Returns snapshots of the order book including yes/no bids and asks with prices in both cents and dollars. All timestamps are in **milliseconds**. Orderbook data has history starting from **October 29th, 2025**. **Note:** When fetching the latest orderbook (without start/end times), the limit parameter is ignored."
           },
           "href": "/api-reference/endpoint/get-kalshi-orderbook-history"
         }
