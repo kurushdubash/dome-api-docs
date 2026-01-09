@@ -1609,6 +1609,620 @@
           "href": "/api-reference/endpoint/get-markets"
         }
       }
+    },    
+    "/polymarket/activity": {
+      "get": {
+        "operationId": "getActivity",
+        "summary": "Get Activity",
+        "description": "Fetches activity data for a specific user with optional filtering by market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`.",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "required": true,
+            "description": "User wallet address to fetch activity for",
+            "schema": {
+              "type": "string",
+              "pattern": "^0x[0-9a-fA-F]{40}$",
+              "example": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
+            }
+          },
+          {
+            "name": "start_time",
+            "in": "query",
+            "required": false,
+            "description": "Filter activity from this Unix timestamp in seconds (inclusive)",
+            "schema": {
+              "type": "integer",
+              "example": 1640995200
+            }
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "required": false,
+            "description": "Filter activity until this Unix timestamp in seconds (inclusive)",
+            "schema": {
+              "type": "integer",
+              "example": 1672531200
+            }
+          },
+          {
+            "name": "market_slug",
+            "in": "query",
+            "required": false,
+            "description": "Filter activity by market slug",
+            "schema": {
+              "type": "string",
+              "example": "bitcoin-up-or-down-july-25-8pm-et"
+            }
+          },
+          {
+            "name": "condition_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter activity by condition ID",
+            "schema": {
+              "type": "string",
+              "example": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of activities to return (1-1000)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 100,
+              "example": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Number of activities to skip for pagination",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "example": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity response with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "activities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "token_id": {
+                            "type": "string",
+                            "example": ""
+                          },
+                          "side": {
+                            "type": "string",
+                            "enum": [
+                              "MERGE",
+                              "SPLIT",
+                              "REDEEM"
+                            ],
+                            "example": "REDEEM"
+                          },
+                          "market_slug": {
+                            "type": "string",
+                            "example": "will-the-doj-charge-boeing"
+                          },
+                          "condition_id": {
+                            "type": "string",
+                            "example": "0x92e4b1b8e0621fab0537486e7d527322569d7a8fd394b3098ff4bb1d6e1c0bbd"
+                          },
+                          "shares": {
+                            "type": "number",
+                            "example": 187722726,
+                            "description": "Raw number of shares (from the blockchain)"
+                          },
+                          "shares_normalized": {
+                            "type": "number",
+                            "example": 187.722726,
+                            "description": "Number of shares normalized (raw divided by 1000000)"
+                          },
+                          "price": {
+                            "type": "number",
+                            "example": 1
+                          },
+                          "tx_hash": {
+                            "type": "string",
+                            "example": "0x028baff23a90c10728606781d15077098ee93c991ea204aa52a0bd2869187574"
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Will the DOJ charge Boeing?"
+                          },
+                          "timestamp": {
+                            "type": "integer",
+                            "description": "Unix timestamp in seconds when the activity occurred",
+                            "example": 1721263049
+                          },
+                          "order_hash": {
+                            "type": "string",
+                            "example": ""
+                          },
+                          "user": {
+                            "type": "string",
+                            "description": "User wallet address",
+                            "example": "0xfd9c3e7f8c56eb4186372f343c873cce154b3873"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "integer",
+                          "example": 50
+                        },
+                        "offset": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "count": {
+                          "type": "integer",
+                          "description": "Total number of activities matching the filters",
+                          "example": 1250
+                        },
+                        "has_more": {
+                          "type": "boolean",
+                          "description": "Whether there are more activities available",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters or validation errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Missing required parameter"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "user parameter is required"
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_user": {
+                    "summary": "Missing required user parameter",
+                    "value": {
+                      "error": "Missing required parameter",
+                      "message": "user parameter is required"
+                    }
+                  },
+                  "invalid_start_time": {
+                    "summary": "Invalid start_time parameter",
+                    "value": {
+                      "error": "Invalid start_time parameter",
+                      "message": "start_time must be a valid Unix timestamp"
+                    }
+                  },
+                  "invalid_end_time": {
+                    "summary": "Invalid end_time parameter",
+                    "value": {
+                      "error": "Invalid end_time parameter",
+                      "message": "end_time must be a valid Unix timestamp"
+                    }
+                  },
+                  "invalid_time_range": {
+                    "summary": "Invalid time range",
+                    "value": {
+                      "error": "Invalid time range",
+                      "message": "start_time must be less than end_time"
+                    }
+                  },
+                  "invalid_limit": {
+                    "summary": "Invalid limit",
+                    "value": {
+                      "error": "Invalid limit parameter",
+                      "message": "limit must be a number between 1 and 1000"
+                    }
+                  },
+                  "invalid_offset": {
+                    "summary": "Invalid offset",
+                    "value": {
+                      "error": "Invalid offset parameter",
+                      "message": "offset must be a non-negative number"
+                    }
+                  },
+                  "invalid_filter_combination": {
+                    "summary": "Invalid filter combination",
+                    "value": {
+                      "error": "Invalid filter combination",
+                      "message": "Only one of market_slug or condition_id can be provided"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to fetch activity data"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Activity",
+            "description": "Fetches activity data for a specific user with optional filtering by market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`."
+          },
+          "href": "/api-reference/endpoint/get-activity"
+        }
+      }
+    },
+    "/polymarket/positions/wallet/{wallet_address}": {
+      "parameters": [
+        {
+          "name": "wallet_address",
+          "in": "path",
+          "required": true,
+          "description": "The Proxy wallet address to fetch positions for",
+          "schema": {
+            "type": "string",
+            "pattern": "^0x[0-9a-fA-F]{40}$",
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getPositions",
+        "summary": "Get Positions",
+        "description": "Fetches all Polymarket positions for a proxy wallet address. Returns positions with balance >= 10,000 shares (0.01 normalized) with market info.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of positions to return per page. Defaults to 100, maximum 100.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "example": 100
+            }
+          },
+          {
+            "name": "pagination_key",
+            "in": "query",
+            "required": false,
+            "description": "Pagination key returned from previous request to fetch next page of results",
+            "schema": {
+              "type": "string",
+              "example": "NjhlMGM4MDAtZDkwNi00YjMyLWEzOWMtYTRlMTk5MzRkNWVl"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Positions response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "wallet_address": {
+                      "type": "string",
+                      "description": "The wallet address (normalized to lowercase)",
+                      "example": "0x1234567890abcdef1234567890abcdef12345678"
+                    },
+                    "positions": {
+                      "type": "array",
+                      "description": "Array of position objects",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "wallet": {
+                            "type": "string",
+                            "description": "The wallet address",
+                            "example": "0x1234567890abcdef1234567890abcdef12345678"
+                          },
+                          "token_id": {
+                            "type": "string",
+                            "description": "The Polymarket token ID for this position",
+                            "example": "19701256321759583954581192053894521654935987478209343000964756587964612528044"
+                          },
+                          "condition_id": {
+                            "type": "string",
+                            "description": "The condition ID for the market",
+                            "example": "0x1234abcd..."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Market title",
+                            "example": "Will Bitcoin reach $100k by end of 2025?"
+                          },
+                          "shares": {
+                            "type": "integer",
+                            "description": "Number of shares (raw, not normalized)",
+                            "example": 50000000
+                          },
+                          "shares_normalized": {
+                            "type": "number",
+                            "description": "Number of shares normalized (divided by 1,000,000)",
+                            "example": 50.0
+                          },
+                          "redeemable": {
+                            "type": "boolean",
+                            "description": "Whether this position can be redeemed (market completed and is closed)",
+                            "example": false
+                          },
+                          "market_slug": {
+                            "type": "string",
+                            "description": "The market slug",
+                            "example": "will-bitcoin-reach-100k-by-end-of-2025"
+                          },
+                          "event_slug": {
+                            "type": "string",
+                            "description": "The event slug",
+                            "example": "bitcoin-price-predictions"
+                          },
+                          "image": {
+                            "type": "string",
+                            "description": "URL to market image",
+                            "example": "https://polymarket.com/images/..."
+                          },
+                          "label": {
+                            "type": "string",
+                            "description": "The outcome label for this token (e.g., 'Yes' or 'No')",
+                            "example": "Yes"
+                          },
+                          "winning_outcome": {
+                            "type": "object",
+                            "nullable": true,
+                            "description": "Information about the winning outcome if market is closed, null if market is still open or no outcome determined",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "Token ID of the winning outcome",
+                                "example": "19701256321759583954581192053894521654935987478209343000964756587964612528044"
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "Label of the winning outcome",
+                                "example": "Yes"
+                              }
+                            }
+                          },
+                          "start_time": {
+                            "type": "integer",
+                            "description": "Market start timestamp (Unix seconds)",
+                            "example": 1640995200
+                          },
+                          "end_time": {
+                            "type": "integer",
+                            "description": "Market end timestamp (Unix seconds)",
+                            "example": 1672531200
+                          },
+                          "completed_time": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Market completion timestamp (Unix seconds), currently always null",
+                            "example": null
+                          },
+                          "close_time": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Market close timestamp (Unix seconds) if market is closed, null if still open",
+                            "example": 1672531200
+                          },
+                          "game_start_time": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Game start time for sports markets, null for non-sports markets",
+                            "example": "2025-01-15T19:00:00Z"
+                          },
+                          "market_status": {
+                            "type": "string",
+                            "enum": ["open", "closed"],
+                            "description": "Whether the market is open or closed",
+                            "example": "open"
+                          },
+                          "negativeRisk": {
+                            "type": "boolean",
+                            "description": "Whether this market has negative risk",
+                            "example": false
+                          }
+                        },
+                        "required": [
+                          "wallet",
+                          "token_id",
+                          "condition_id",
+                          "title",
+                          "shares",
+                          "shares_normalized",
+                          "redeemable",
+                          "market_slug",
+                          "event_slug",
+                          "image",
+                          "label",
+                          "winning_outcome",
+                          "start_time",
+                          "end_time",
+                          "completed_time",
+                          "close_time",
+                          "game_start_time",
+                          "market_status",
+                          "negativeRisk"
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "description": "Pagination information",
+                      "properties": {
+                        "has_more": {
+                          "type": "boolean",
+                          "description": "Whether there are more results available",
+                          "example": false
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "description": "The limit used for this request",
+                          "example": 100
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Pagination key to use for fetching next page, null if no more pages",
+                          "example": null
+                        }
+                      },
+                      "required": ["has_more", "limit", "pagination_key"]
+                    }
+                  },
+                  "required": ["wallet_address", "positions", "pagination"]
+                },
+                "examples": {
+                  "with_positions": {
+                    "summary": "Wallet with positions",
+                    "description": "Response when wallet has active positions",
+                    "value": {
+                      "wallet_address": "0x1234567890abcdef1234567890abcdef12345678",
+                      "positions": [
+                        {
+                          "wallet": "0x1234567890abcdef1234567890abcdef12345678",
+                          "token_id": "19701256321759583954581192053894521654935987478209343000964756587964612528044",
+                          "condition_id": "0xabcd1234...",
+                          "title": "Will Bitcoin reach $100k by end of 2025?",
+                          "shares": 50000000,
+                          "shares_normalized": 50.0,
+                          "redeemable": false,
+                          "market_slug": "will-bitcoin-reach-100k-by-end-of-2025",
+                          "event_slug": "bitcoin-price-predictions",
+                          "image": "https://polymarket.com/images/...",
+                          "label": "Yes",
+                          "winning_outcome": null,
+                          "start_time": 1640995200,
+                          "end_time": 1672531200,
+                          "completed_time": null,
+                          "close_time": null,
+                          "game_start_time": null,
+                          "market_status": "open",
+                          "negativeRisk": false
+                        }
+                      ],
+                      "pagination": {
+                        "has_more": false,
+                        "limit": 100,
+                        "pagination_key": null
+                      }
+                    }
+                  },
+                  "empty_positions": {
+                    "summary": "Wallet with no positions",
+                    "description": "Response when wallet has no positions >= 10,000 shares",
+                    "value": {
+                      "wallet_address": "0x1234567890abcdef1234567890abcdef12345678",
+                      "positions": [],
+                      "pagination": {
+                        "has_more": false,
+                        "limit": 100,
+                        "pagination_key": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid wallet address"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "wallet_address must be a valid Ethereum address (0x followed by 40 hex characters)"
+                    }
+                  }
+                },
+                "examples": {
+                  "missing_wallet": {
+                    "summary": "Missing wallet address",
+                    "value": {
+                      "error": "Missing parameter",
+                      "message": "wallet_address is required"
+                    }
+                  },
+                  "invalid_wallet": {
+                    "summary": "Invalid wallet address format",
+                    "value": {
+                      "error": "Invalid wallet address",
+                      "message": "wallet_address must be a valid Ethereum address (0x followed by 40 hex characters)"
+                    }
+                  },
+                  "invalid_limit": {
+                    "summary": "Invalid limit parameter",
+                    "value": {
+                      "error": "Invalid limit parameter",
+                      "message": "limit must be a number between 1 and 100"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Positions",
+            "description": "Fetches all Polymarket positions for a proxy wallet address. Returns positions with balance >= 10,000 shares (0.01 normalized) with market info."
+          },
+          "href": "/api-reference/endpoint/get-positions"
+        }
+      }
     },
     "/kalshi/markets": {
       "get": {
@@ -2240,291 +2854,6 @@
             "description": "Fetches historical orderbook snapshots for a specific Kalshi market (**ticker**) over a specified time range. If no **start_time** and **end_time** are provided, returns the latest orderbook snapshot for the market. Returns snapshots of the order book including yes/no bids and asks with prices in both cents and dollars. All timestamps are in **milliseconds**. Orderbook data has history starting from **October 29th, 2025**. **Note:** When fetching the latest orderbook (without start/end times), the limit parameter is ignored."
           },
           "href": "/api-reference/endpoint/get-kalshi-orderbook-history"
-        }
-      }
-    },
-    "/polymarket/activity": {
-      "get": {
-        "operationId": "getActivity",
-        "summary": "Get Activity",
-        "description": "Fetches activity data for a specific user with optional filtering by market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`.",
-        "parameters": [
-          {
-            "name": "user",
-            "in": "query",
-            "required": true,
-            "description": "User wallet address to fetch activity for",
-            "schema": {
-              "type": "string",
-              "pattern": "^0x[0-9a-fA-F]{40}$",
-              "example": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b"
-            }
-          },
-          {
-            "name": "start_time",
-            "in": "query",
-            "required": false,
-            "description": "Filter activity from this Unix timestamp in seconds (inclusive)",
-            "schema": {
-              "type": "integer",
-              "example": 1640995200
-            }
-          },
-          {
-            "name": "end_time",
-            "in": "query",
-            "required": false,
-            "description": "Filter activity until this Unix timestamp in seconds (inclusive)",
-            "schema": {
-              "type": "integer",
-              "example": 1672531200
-            }
-          },
-          {
-            "name": "market_slug",
-            "in": "query",
-            "required": false,
-            "description": "Filter activity by market slug",
-            "schema": {
-              "type": "string",
-              "example": "bitcoin-up-or-down-july-25-8pm-et"
-            }
-          },
-          {
-            "name": "condition_id",
-            "in": "query",
-            "required": false,
-            "description": "Filter activity by condition ID",
-            "schema": {
-              "type": "string",
-              "example": "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "description": "Number of activities to return (1-1000)",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 1000,
-              "default": 100,
-              "example": 50
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "description": "Number of activities to skip for pagination",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "example": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Activity response with pagination",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "activities": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "token_id": {
-                            "type": "string",
-                            "example": ""
-                          },
-                          "side": {
-                            "type": "string",
-                            "enum": [
-                              "MERGE",
-                              "SPLIT",
-                              "REDEEM"
-                            ],
-                            "example": "REDEEM"
-                          },
-                          "market_slug": {
-                            "type": "string",
-                            "example": "will-the-doj-charge-boeing"
-                          },
-                          "condition_id": {
-                            "type": "string",
-                            "example": "0x92e4b1b8e0621fab0537486e7d527322569d7a8fd394b3098ff4bb1d6e1c0bbd"
-                          },
-                          "shares": {
-                            "type": "number",
-                            "example": 187722726,
-                            "description": "Raw number of shares (from the blockchain)"
-                          },
-                          "shares_normalized": {
-                            "type": "number",
-                            "example": 187.722726,
-                            "description": "Number of shares normalized (raw divided by 1000000)"
-                          },
-                          "price": {
-                            "type": "number",
-                            "example": 1
-                          },
-                          "tx_hash": {
-                            "type": "string",
-                            "example": "0x028baff23a90c10728606781d15077098ee93c991ea204aa52a0bd2869187574"
-                          },
-                          "title": {
-                            "type": "string",
-                            "example": "Will the DOJ charge Boeing?"
-                          },
-                          "timestamp": {
-                            "type": "integer",
-                            "description": "Unix timestamp in seconds when the activity occurred",
-                            "example": 1721263049
-                          },
-                          "order_hash": {
-                            "type": "string",
-                            "example": ""
-                          },
-                          "user": {
-                            "type": "string",
-                            "description": "User wallet address",
-                            "example": "0xfd9c3e7f8c56eb4186372f343c873cce154b3873"
-                          }
-                        }
-                      }
-                    },
-                    "pagination": {
-                      "type": "object",
-                      "properties": {
-                        "limit": {
-                          "type": "integer",
-                          "example": 50
-                        },
-                        "offset": {
-                          "type": "integer",
-                          "example": 0
-                        },
-                        "count": {
-                          "type": "integer",
-                          "description": "Total number of activities matching the filters",
-                          "example": 1250
-                        },
-                        "has_more": {
-                          "type": "boolean",
-                          "description": "Whether there are more activities available",
-                          "example": true
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Invalid parameters or validation errors",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Missing required parameter"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "user parameter is required"
-                    }
-                  }
-                },
-                "examples": {
-                  "missing_user": {
-                    "summary": "Missing required user parameter",
-                    "value": {
-                      "error": "Missing required parameter",
-                      "message": "user parameter is required"
-                    }
-                  },
-                  "invalid_start_time": {
-                    "summary": "Invalid start_time parameter",
-                    "value": {
-                      "error": "Invalid start_time parameter",
-                      "message": "start_time must be a valid Unix timestamp"
-                    }
-                  },
-                  "invalid_end_time": {
-                    "summary": "Invalid end_time parameter",
-                    "value": {
-                      "error": "Invalid end_time parameter",
-                      "message": "end_time must be a valid Unix timestamp"
-                    }
-                  },
-                  "invalid_time_range": {
-                    "summary": "Invalid time range",
-                    "value": {
-                      "error": "Invalid time range",
-                      "message": "start_time must be less than end_time"
-                    }
-                  },
-                  "invalid_limit": {
-                    "summary": "Invalid limit",
-                    "value": {
-                      "error": "Invalid limit parameter",
-                      "message": "limit must be a number between 1 and 1000"
-                    }
-                  },
-                  "invalid_offset": {
-                    "summary": "Invalid offset",
-                    "value": {
-                      "error": "Invalid offset parameter",
-                      "message": "offset must be a non-negative number"
-                    }
-                  },
-                  "invalid_filter_combination": {
-                    "summary": "Invalid filter combination",
-                    "value": {
-                      "error": "Invalid filter combination",
-                      "message": "Only one of market_slug or condition_id can be provided"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "example": "Internal Server Error"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Failed to fetch activity data"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "x-mint": {
-          "metadata": {
-            "title": "Activity",
-            "description": "Fetches activity data for a specific user with optional filtering by market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`."
-          },
-          "href": "/api-reference/endpoint/get-activity"
         }
       }
     },
