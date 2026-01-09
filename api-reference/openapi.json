@@ -2224,6 +2224,172 @@
         }
       }
     },
+    "/kalshi/market-price/{market_ticker}": {
+      "parameters": [
+        {
+          "name": "market_ticker",
+          "in": "path",
+          "required": true,
+          "description": "The market ticker for the Kalshi market",
+          "schema": {
+            "type": "string",
+            "example": "KXNFLGAME-25AUG16ARIDEN-ARI"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getKalshiMarketPrice",
+        "summary": "Get Kalshi Market Price",
+        "description": "Fetches the current market price for a Kalshi market by `market_ticker`. When `at_time` is not provided, returns the most real-time price available. When `at_time` is provided, returns the historical market price at that specific timestamp. Returns prices for both yes and no sides.\n\n**Example Request (with historical timestamp):**\n```bash\ncurl 'https://api.domeapi.io/v1/kalshi/market-price/KXNFLGAME-25AUG16ARIDEN-ARI?at_time=1762164600' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'\n```\n\n**Example Request (real-time price):**\n```bash\ncurl 'https://api.domeapi.io/v1/kalshi/market-price/KXNFLGAME-25AUG16ARIDEN-ARI' \\\n  -H 'Authorization: Bearer YOUR_TOKEN'\n```",
+        "parameters": [
+          {
+            "name": "at_time",
+            "in": "query",
+            "required": false,
+            "description": "Optional Unix timestamp (in seconds) to fetch a historical market price. If not provided, returns the most real-time price available.",
+            "schema": {
+              "type": "integer",
+              "example": 1762164600
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Market price response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "yes": {
+                      "type": "object",
+                      "description": "Yes side price information",
+                      "properties": {
+                        "price": {
+                          "type": "number",
+                          "description": "The yes side price in dollars (between 0 and 1)",
+                          "example": 0.75
+                        },
+                        "at_time": {
+                          "type": "integer",
+                          "description": "The timestamp for which the price was fetched (Unix timestamp in seconds)",
+                          "example": 1762164600
+                        }
+                      },
+                      "required": [
+                        "price",
+                        "at_time"
+                      ]
+                    },
+                    "no": {
+                      "type": "object",
+                      "description": "No side price information",
+                      "properties": {
+                        "price": {
+                          "type": "number",
+                          "description": "The no side price in dollars (between 0 and 1)",
+                          "example": 0.25
+                        },
+                        "at_time": {
+                          "type": "integer",
+                          "description": "The timestamp for which the price was fetched (Unix timestamp in seconds)",
+                          "example": 1762164600
+                        }
+                      },
+                      "required": [
+                        "price",
+                        "at_time"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "yes",
+                    "no"
+                  ]
+                },
+                "examples": {
+                  "with_at_time": {
+                    "summary": "Historical price lookup",
+                    "description": "Response when `at_time` parameter is provided",
+                    "value": {
+                      "yes": {
+                        "price": 0.75,
+                        "at_time": 1762164600
+                      },
+                      "no": {
+                        "price": 0.25,
+                        "at_time": 1762164600
+                      }
+                    }
+                  },
+                  "real_time": {
+                    "summary": "Real-time price lookup",
+                    "description": "Response when `at_time` parameter is omitted (most recent price)",
+                    "value": {
+                      "yes": {
+                        "price": 0.82,
+                        "at_time": 1757008834
+                      },
+                      "no": {
+                        "price": 0.18,
+                        "at_time": 1757008834
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid at_time parameter"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "at_time must be a valid Unix timestamp in seconds"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - Market not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Not Found"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No price data found for market_ticker KXNFLGAME-25AUG16ARIDEN-ARI"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Market Price",
+            "description": "Fetches the current market price for a Kalshi market by market_ticker. Returns prices for both yes and no sides. Allows historical lookups via the at_time query parameter."
+          },
+          "href": "/api-reference/endpoint/get-kalshi-market-price"
+        }
+      }
+    },
     "/kalshi/markets": {
       "get": {
         "operationId": "getKalshiMarkets",

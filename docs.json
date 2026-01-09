@@ -59,6 +59,7 @@
                         "pages": [
                             "api-reference/openapi.json get /kalshi/markets",
                             "api-reference/openapi.json get /kalshi/trades",
+                            "api-reference/openapi.json get /kalshi/market-price/{market_ticker}",
                             "api-reference/openapi.json get /kalshi/orderbooks"
                         ]
                     },
