@@ -460,13 +460,13 @@
       "get": {
         "operationId": "getWallet",
         "summary": "Get Wallet",
-        "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type information. Optionally returns trading metrics when `with_metrics=true`.",
+        "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address, a proxy wallet address, or a user handle. Returns the associated EOA, proxy, wallet type, handle, pseudonym, and profile image. Optionally returns trading metrics when `with_metrics=true`.",
         "parameters": [
           {
             "name": "eoa",
             "in": "query",
             "required": false,
-            "description": "EOA (Externally Owned Account) wallet address. Either `eoa` or `proxy` must be provided, but not both.",
+            "description": "EOA (Externally Owned Account) wallet address. Either `eoa`, `proxy`, or `handle` must be provided, but not more than one.",
             "schema": {
               "type": "string",
               "pattern": "^0x[0-9a-fA-F]{40}$",
@@ -477,11 +477,21 @@
             "name": "proxy",
             "in": "query",
             "required": false,
-            "description": "Proxy wallet address. Either `eoa` or `proxy` must be provided, but not both.",
+            "description": "Proxy wallet address. Either `eoa`, `proxy`, or `handle` must be provided, but not more than one.",
             "schema": {
               "type": "string",
               "pattern": "^0x[0-9a-fA-F]{40}$",
               "example": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d"
+            }
+          },
+          {
+            "name": "handle",
+            "in": "query",
+            "required": false,
+            "description": "User handle/username. Either `eoa`, `proxy`, or `handle` must be provided, but not more than one.",
+            "schema": {
+              "type": "string",
+              "example": "satoshi"
             }
           },
           {
@@ -538,6 +548,24 @@
                       "type": "string",
                       "description": "The type of wallet",
                       "example": "safe"
+                    },
+                    "handle": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "User handle/username",
+                      "example": "satoshi"
+                    },
+                    "pseudonym": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "User pseudonym/display name",
+                      "example": "Satoshi Nakamoto"
+                    },
+                    "image": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "User profile image URL",
+                      "example": "https://example.com/avatar.png"
                     },
                     "wallet_metrics": {
                       "type": "object",
@@ -617,7 +645,10 @@
                     "value": {
                       "eoa": "0xe9a69b28ffd86f6ea0c5d8171c95537479b84a29",
                       "proxy": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d",
-                      "wallet_type": "safe"
+                      "wallet_type": "safe",
+                      "handle": "satoshi",
+                      "pseudonym": "Satoshi Nakamoto",
+                      "image": "https://example.com/avatar.png"
                     }
                   },
                   "with_metrics": {
@@ -627,6 +658,9 @@
                       "eoa": "0xe9a69b28ffd86f6ea0c5d8171c95537479b84a29",
                       "proxy": "0x60881d7dce725bfb0399ee0b11cc11f5782f257d",
                       "wallet_type": "safe",
+                      "handle": "satoshi",
+                      "pseudonym": "Satoshi Nakamoto",
+                      "image": "https://example.com/avatar.png",
                       "wallet_metrics": {
                         "total_volume": 150000.50,
                         "total_trades": 450,
@@ -665,14 +699,14 @@
                     "summary": "Missing required parameter",
                     "value": {
                       "error": "BAD_REQUEST",
-                      "message": "Either eoa or proxy parameter must be provided"
+                      "message": "Either eoa, proxy, or handle parameter must be provided"
                     }
                   },
                   "both_parameters": {
                     "summary": "Both parameters provided",
                     "value": {
                       "error": "BAD_REQUEST",
-                      "message": "Only one of eoa or proxy can be provided, not both"
+                      "message": "Only one of eoa, proxy, or handle can be provided"
                     }
                   },
                   "invalid_address": {
@@ -710,7 +744,7 @@
         "x-mint": {
           "metadata": {
             "title": "Wallet",
-            "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address or a proxy wallet address. Returns the associated EOA, proxy, and wallet type. Optionally returns trading metrics including total volume, number of trades, and unique markets traded when `with_metrics=true`."
+            "description": "Fetches wallet information by providing either an EOA (Externally Owned Account) address, a proxy wallet address, or a user handle. Returns the associated EOA, proxy, wallet type, handle, pseudonym, and profile image. Optionally returns trading metrics including total volume, number of trades, and unique markets traded when `with_metrics=true`."
           },
           "href": "/api-reference/endpoint/get-wallet"
         }
