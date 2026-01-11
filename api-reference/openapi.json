@@ -488,7 +488,7 @@
             "name": "handle",
             "in": "query",
             "required": false,
-            "description": "User handle/username. Either `eoa`, `proxy`, or `handle` must be provided, but not more than one.",
+            "description": "User handle/username. Accepts both formats: `username` or `@username` (the @ prefix will be automatically stripped). Either `eoa`, `proxy`, or `handle` must be provided, but not more than one.",
             "schema": {
               "type": "string",
               "example": "satoshi"
@@ -1532,6 +1532,52 @@
                               "closed"
                             ],
                             "example": "open"
+                          },
+                          "extra_fields": {
+                            "type": "array",
+                            "description": "Additional market-specific fields. For crypto price markets, this array includes 'price_to_beat' and 'final_price' fields.",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "key": {
+                                  "type": "string",
+                                  "description": "The field name",
+                                  "example": "price_to_beat"
+                                },
+                                "value": {
+                                  "oneOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "boolean"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ],
+                                  "description": "The field value",
+                                  "example": 98765.43
+                                }
+                              },
+                              "required": [
+                                "key",
+                                "value"
+                              ]
+                            },
+                            "example": [
+                              {
+                                "key": "price_to_beat",
+                                "value": 98765.43
+                              },
+                              {
+                                "key": "final_price",
+                                "value": 98801.21
+                              }
+                            ]
                           }
                         }
                       }
@@ -3273,7 +3319,7 @@
           "name": "sport",
           "in": "path",
           "required": true,
-          "description": "The sport to find matching markets for.\n\nSport abbreviations:\n- nfl = Football\n- mlb = Baseball\n- cfb = College Football\n- nba = Basketball\n- nhl = Hockey\n- cbb = College Basketball",
+          "description": "The sport to find matching markets for.\n\nSport abbreviations:\n- nfl = Football\n- mlb = Baseball\n- cfb = College Football\n- nba = Basketball\n- nhl = Hockey\n- cbb = College Basketball\n- pga = Golf\n- tennis = Tennis",
           "schema": {
             "type": "string",
             "enum": [
@@ -3282,7 +3328,9 @@
               "cfb",
               "nba",
               "nhl",
-              "cbb"
+              "cbb",
+              "pga",
+              "tennis"
             ],
             "example": "nfl"
           }
