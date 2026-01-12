@@ -1545,7 +1545,8 @@
                                   "example": "price_to_beat"
                                 },
                                 "value": {
-                                  "oneOf": [
+                                  "nullable": true,
+                                  "anyOf": [
                                     {
                                       "type": "number"
                                     },
@@ -1554,9 +1555,6 @@
                                     },
                                     {
                                       "type": "boolean"
-                                    },
-                                    {
-                                      "type": "null"
                                     }
                                   ],
                                   "description": "The field value",
