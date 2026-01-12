@@ -1534,48 +1534,26 @@
                             "example": "open"
                           },
                           "extra_fields": {
-                            "type": "array",
-                            "description": "Additional market-specific fields. For crypto price markets, this array includes 'price_to_beat' and 'final_price' fields.",
-                            "items": {
-                              "type": "object",
-                              "properties": {
-                                "key": {
-                                  "type": "string",
-                                  "description": "The field name",
-                                  "example": "price_to_beat"
+                            "type": "object",
+                            "description": "Additional market-specific fields as a map of key-value pairs. For updown markets (markets with slugs containing '-updown-15m-', '-up-or-down-', or '-updown-4h-'), this object includes 'price_to_beat' and 'final_price' fields. Empty object if no extra fields are present.",
+                            "additionalProperties": {
+                              "nullable": true,
+                              "anyOf": [
+                                {
+                                  "type": "number"
                                 },
-                                "value": {
-                                  "nullable": true,
-                                  "anyOf": [
-                                    {
-                                      "type": "number"
-                                    },
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "boolean"
-                                    }
-                                  ],
-                                  "description": "The field value",
-                                  "example": 98765.43
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "boolean"
                                 }
-                              },
-                              "required": [
-                                "key",
-                                "value"
                               ]
                             },
-                            "example": [
-                              {
-                                "key": "price_to_beat",
-                                "value": 98765.43
-                              },
-                              {
-                                "key": "final_price",
-                                "value": 98801.21
-                              }
-                            ]
+                            "example": {
+                              "price_to_beat": 98765.43,
+                              "final_price": 98801.21
+                            }
                           }
                         }
                       }
