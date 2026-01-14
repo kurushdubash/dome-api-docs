@@ -1,0 +1,486 @@
+---
+title: "Order Router"
+description: "Place orders on Polymarket with geo-unrestricted server-side execution"
+layout: "page"
+---
+
+The Polymarket Order Router enables server-side order placement on Polymarket through Dome's infrastructure. Orders are signed locally by your users' wallets and executed via Dome servers, providing geo-unrestricted access and improved order execution through builder attribution.
+
+## Key Benefits
+
+- **Geo-unrestricted**: Orders placed from Dome servers, not blocked regions
+- **Builder attribution**: Orders routed through Dome's builder for better execution
+- **No signature popups**: After initial setup, no wallet signatures needed per order
+- **Wallet flexibility**: Supports Privy embedded wallets and external wallets (MetaMask, Rabby)
+
+## Prerequisites
+
+Before using the Order Router, you need:
+
+1. A Dome API key from [dashboard.domeapi.io](https://dashboard.domeapi.io/)
+2. The `@dome-api/sdk` package installed
+3. A wallet provider (Privy for embedded wallets, or any EVM wallet for external wallets)
+4. USDC.e funded on Polygon for your users' wallets
+
+## Installation
+
+```bash
+npm install @dome-api/sdk
+```
+
+For Privy integration:
+
+```bash
+npm install @dome-api/sdk @privy-io/server-auth
+```
+
+## Quick Start
+
+### 1. Initialize the Router
+
+```typescript
+import { PolymarketRouter, createPrivySignerFromEnv } from '@dome-api/sdk';
+
+const router = new PolymarketRouter({
+  chainId: 137, // Polygon mainnet
+  apiKey: process.env.DOME_API_KEY,
+});
+```
+
+### 2. Create a Signer
+
+For Privy embedded wallets:
+
+```typescript
+const signer = createPrivySignerFromEnv(walletId, walletAddress);
+```
+
+For external wallets, implement the `RouterSigner` interface:
+
+```typescript
+const signer = {
+  getAddress: async () => walletAddress,
+  signTypedData: async (payload) => {
+    // Use your wallet provider's signTypedData method
+    return await wallet.signTypedData(payload);
+  },
+};
+```
+
+### 3. Link User (One-Time Setup)
+
+Link the user to Polymarket to create CLOB API credentials. This requires one wallet signature.
+
+```typescript
+const credentials = await router.linkUser({
+  userId: 'user-123',
+  signer,
+});
+
+// Store these credentials in your database
+console.log('API Key:', credentials.apiKey);
+console.log('API Secret:', credentials.apiSecret);
+console.log('Passphrase:', credentials.apiPassphrase);
+```
+
+### 4. Place Orders
+
+Once linked, place orders without additional wallet signatures:
+
+```typescript
+const order = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '104173557214744537570424345347209544585775842950109756851652855913015295701992',
+    side: 'buy',
+    size: 100,      // Number of shares
+    price: 0.50,    // Price per share (0-1)
+    signer,
+  },
+  credentials
+);
+
+console.log('Order placed:', order);
+// { success: true, status: 'matched', transactionHashes: [...] }
+```
+
+## Order Flow
+
+```
+1. SDK creates & signs order locally (using user's wallet)
+2. SDK sends signed order to Dome server
+3. Dome server adds builder attribution headers
+4. Dome server posts to Polymarket CLOB
+5. Response returned to SDK
+```
+
+## REST Endpoint
+
+The SDK uses the following REST endpoint under the hood. You can also call it directly if you're not using the TypeScript SDK.
+
+### `POST /polymarket/placeOrder`
+
+**Endpoint:** `https://api.domeapi.io/v1/polymarket/placeOrder`
+
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer <DOME_API_KEY>
+```
+
+**Request Body (JSON-RPC):**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "placeOrder",
+  "id": "unique-request-id",
+  "params": {
+    "signedOrder": {
+      "salt": "123456789",
+      "maker": "0x...",
+      "signer": "0x...",
+      "taker": "0x0000000000000000000000000000000000000000",
+      "tokenId": "104173557214744537570424345347209544585775842950109756851652855913015295701992",
+      "makerAmount": "50000000",
+      "takerAmount": "100000000",
+      "expiration": "0",
+      "nonce": "0",
+      "feeRateBps": "0",
+      "side": "BUY",
+      "signatureType": 0,
+      "signature": "0x..."
+    },
+    "orderType": "GTC",
+    "credentials": {
+      "apiKey": "your-polymarket-api-key",
+      "apiSecret": "your-polymarket-api-secret",
+      "apiPassphrase": "your-polymarket-passphrase"
+    },
+    "clientOrderId": "unique-client-order-id"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "unique-request-id",
+  "result": {
+    "success": true,
+    "orderId": "order-id-from-polymarket",
+    "clientOrderId": "unique-client-order-id",
+    "status": "LIVE",
+    "orderHash": "0x...",
+    "transactionHashes": ["0x..."],
+    "metadata": {
+      "region": "us-east-1",
+      "latencyMs": 85,
+      "timestamp": 1704067200000
+    }
+  }
+}
+```
+
+**Order Status Values:**
+- `LIVE` - Order is on the orderbook
+- `MATCHED` - Order was filled immediately
+- `DELAYED` - Order is being processed
+
+**Error Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "unique-request-id",
+  "error": {
+    "code": -32000,
+    "message": "Order rejected",
+    "data": {
+      "reason": "Insufficient balance"
+    }
+  }
+}
+```
+
+## SDK Reference
+
+### `PolymarketRouter`
+
+Initialize the router with your configuration:
+
+```typescript
+const router = new PolymarketRouter({
+  apiKey: process.env.DOME_API_KEY,  // Required for placeOrder
+  chainId: 137,                       // 137 = Polygon mainnet
+  clobEndpoint: 'https://clob.polymarket.com',  // Optional
+  rpcUrl: 'https://polygon-rpc.com',            // Optional
+});
+```
+
+### `linkUser(params)`
+
+Creates Polymarket CLOB API credentials. Returns credentials that should be stored in your database.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `userId` | `string` | Yes | Your internal user ID |
+| `signer` | `RouterSigner` | Yes | Wallet signer implementation |
+| `walletType` | `'eoa' \| 'safe'` | No | Wallet type (default: `'eoa'`) |
+| `autoSetAllowances` | `boolean` | No | Auto-set token allowances (default: `true`) |
+| `autoDeploySafe` | `boolean` | No | Auto-deploy Safe wallet (default: `true`, only for `walletType: 'safe'`) |
+
+**Returns:** `PolymarketCredentials` for EOA wallets, or `SafeLinkResult` for Safe wallets.
+
+```typescript
+// EOA wallet
+const credentials = await router.linkUser({
+  userId: 'user-123',
+  signer,
+  walletType: 'eoa',
+});
+
+// Safe wallet (external wallets like MetaMask)
+const result = await router.linkUser({
+  userId: 'user-123',
+  signer,
+  walletType: 'safe',
+  autoDeploySafe: true,
+  autoSetAllowances: true,
+});
+// result.credentials, result.safeAddress
+```
+
+### `placeOrder(params, credentials?)`
+
+Places an order on Polymarket via Dome server.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `userId` | `string` | Yes | Your internal user ID |
+| `marketId` | `string` | Yes | Polymarket token ID |
+| `side` | `'buy' \| 'sell'` | Yes | Order side |
+| `size` | `number` | Yes | Number of shares |
+| `price` | `number` | Yes | Price per share (0-1) |
+| `signer` | `RouterSigner` | Yes | Wallet signer |
+| `orderType` | `'GTC' \| 'GTD' \| 'FOK' \| 'FAK'` | No | Order type (default: `'GTC'`) |
+| `negRisk` | `boolean` | No | Whether market uses neg risk (default: `false`) |
+| `walletType` | `'eoa' \| 'safe'` | No | Wallet type (default: `'eoa'`) |
+| `funderAddress` | `string` | No | Safe address (required for `walletType: 'safe'`) |
+
+**Returns:** Order result with status and transaction hashes.
+
+```typescript
+const order = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '104173557214744537570424345347209544585775842950109756851652855913015295701992',
+    side: 'buy',
+    size: 100,
+    price: 0.50,
+    orderType: 'GTC',
+    signer,
+  },
+  credentials
+);
+```
+
+### `setCredentials(userId, credentials)`
+
+Manually set credentials loaded from your database:
+
+```typescript
+const stored = await db.getCredentials(userId);
+router.setCredentials(userId, stored);
+```
+
+### `getCredentials(userId)`
+
+Get stored credentials from memory:
+
+```typescript
+const creds = router.getCredentials(userId);
+```
+
+## Order Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| `GTC` | Good Till Cancelled | Order stays on book until filled or cancelled |
+| `GTD` | Good Till Date | Order expires at specified time |
+| `FOK` | Fill Or Kill | Must fill completely immediately or cancel |
+| `FAK` | Fill And Kill | Fill as much as possible immediately, cancel rest |
+
+For copy trading or instant confirmation, use `FOK` or `FAK`:
+
+```typescript
+const fokOrder = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '...',
+    side: 'buy',
+    size: 100,
+    price: 0.50,
+    orderType: 'FOK',
+    signer,
+  },
+  credentials
+);
+
+if (fokOrder.status === 'matched') {
+  console.log('Order filled immediately');
+}
+```
+
+## Wallet Types
+
+### EOA Wallets (Privy Embedded)
+
+For Privy-managed embedded wallets:
+
+```typescript
+import { PolymarketRouter, createPrivySignerFromEnv } from '@dome-api/sdk';
+
+const router = new PolymarketRouter({
+  chainId: 137,
+  apiKey: process.env.DOME_API_KEY,
+});
+
+const signer = createPrivySignerFromEnv(walletId, walletAddress);
+
+const credentials = await router.linkUser({
+  userId: 'user-123',
+  signer,
+  walletType: 'eoa',
+});
+
+const order = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '...',
+    side: 'buy',
+    size: 100,
+    price: 0.50,
+    signer,
+  },
+  credentials
+);
+```
+
+### Safe Wallets (External - MetaMask, Rabby)
+
+For external wallets, the router deploys a Safe smart account:
+
+```typescript
+const result = await router.linkUser({
+  userId: 'user-123',
+  signer,
+  walletType: 'safe',
+  autoDeploySafe: true,
+  autoSetAllowances: true,
+});
+
+// Place orders with Safe address as funder
+const order = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '...',
+    side: 'buy',
+    size: 100,
+    price: 0.50,
+    signer,
+    walletType: 'safe',
+    funderAddress: result.safeAddress,
+  },
+  result.credentials
+);
+```
+
+## Credential Storage
+
+Store credentials securely in your database after the initial `linkUser` call:
+
+```typescript
+// Save after linkUser
+await prisma.polymarketCredentials.create({
+  data: {
+    userId: user.id,
+    apiKey: credentials.apiKey,
+    apiSecret: encrypt(credentials.apiSecret),
+    apiPassphrase: encrypt(credentials.apiPassphrase),
+  },
+});
+
+// Load for subsequent orders
+const stored = await prisma.polymarketCredentials.findUnique({
+  where: { userId: user.id },
+});
+
+router.setCredentials(user.id, {
+  apiKey: stored.apiKey,
+  apiSecret: decrypt(stored.apiSecret),
+  apiPassphrase: decrypt(stored.apiPassphrase),
+});
+```
+
+## Error Handling
+
+```typescript
+try {
+  const order = await router.placeOrder(params, credentials);
+} catch (error) {
+  if (error.message.includes('Dome API key')) {
+    // Missing or invalid API key
+  } else if (error.message.includes('Order rejected')) {
+    // Polymarket rejected the order (insufficient balance, invalid market, etc.)
+  } else if (error.message.includes('No credentials')) {
+    // Need to call linkUser first
+  } else if (error.message.includes('not enough balance')) {
+    // Wallet needs USDC.e funding on Polygon
+  } else if (error.message.includes('min size')) {
+    // Order value less than $1 minimum
+  }
+}
+```
+
+## Environment Variables
+
+```bash
+# Dome API (required)
+DOME_API_KEY=your_dome_api_key
+
+# Privy (for embedded wallets)
+PRIVY_APP_ID=your_privy_app_id
+PRIVY_APP_SECRET=your_privy_app_secret
+PRIVY_AUTHORIZATION_KEY=wallet-auth:...
+```
+
+## FAQ
+
+**Q: Do I need a Dome API key?**
+
+Yes, for `placeOrder()`. Get one at [domeapi.io](https://domeapi.io) or contact support.
+
+**Q: Where do I store credentials?**
+
+In your own database. Encrypt `apiSecret` and `apiPassphrase` at rest.
+
+**Q: Why use Dome server instead of direct CLOB?**
+
+Geo-unrestricted access, builder attribution for better execution, and observability.
+
+**Q: What's the minimum order size?**
+
+$1 minimum order value (e.g., 100 shares at $0.01 = $1).
+
+**Q: How do I find market IDs (token IDs)?**
+
+Browse markets at [polymarket.com](https://polymarket.com) or use the [Dome API markets endpoint](/api-reference/openapi.json%20get%20/polymarket/markets).
+
+## Need Help?
+
+- Email: [support@domeapi.com](mailto:support@domeapi.com)
+- Discord: [Join our community](https://discord.gg/fKAbjNAbkt)
+- SDKs: [TypeScript](https://github.com/kurushdubash/dome-sdk-ts) | [Python](https://github.com/kurushdubash/dome-sdk-py)

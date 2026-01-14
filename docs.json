@@ -32,6 +32,10 @@
         },
         "tabs": [
             {
+                "tab": "Order Router",
+                "href": "/order-router"
+            },
+            {
                 "tab": "API",
                 "groups": [
                     {
