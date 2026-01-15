@@ -895,6 +895,16 @@
                             "description": "Price per share",
                             "example": 0.65
                           },
+                          "block_number": {
+                            "type": "integer",
+                            "description": "Block number where the order was placed",
+                            "example": 123456789
+                          },
+                          "log_index": {
+                            "type": "integer",
+                            "description": "Log index of the order event in the block",
+                            "example": 42
+                          },
                           "tx_hash": {
                             "type": "string",
                             "description": "Transaction hash of the order",
@@ -1237,7 +1247,7 @@
       "get": {
         "operationId": "getMarkets",
         "summary": "Get Markets",
-        "description": "Fetches market data with optional filtering and search functionality. Supports filtering by market slug, condition ID, or tags, as well as fuzzy search across market titles and descriptions. Returns markets ordered by volume (most popular first) when filters are applied, or by start_time (most recent first) when no filters are provided.",
+        "description": "Fetches market data with optional filtering and search functionality. Supports filtering by market slug, condition ID, token ID, or tags, as well as fuzzy search across market titles and descriptions. Returns markets ordered by volume (most popular first) when filters are applied, or by start_time (most recent first) when no filters are provided.",
         "parameters": [
           {
             "name": "market_slug",
@@ -1285,6 +1295,25 @@
               },
               "example": [
                 "0x4567b275e6b667a6217f5cb4f06a797d3a1eaf1d0281fb5bc8c75e2046ae7e57"
+              ]
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "token_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter markets by token ID(s). Matches markets where the token_id is either the primary_token_id or secondary_token_id. Can provide multiple values (maximum 100). Each token_id must be a numeric string.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9]+$"
+              },
+              "maxItems": 100,
+              "example": [
+                "24891147099018724959141647991382271578149113344000019968758330059825991230807"
               ]
             },
             "style": "form",
@@ -1405,6 +1434,12 @@
                             "type": "string",
                             "example": "btc-updown-15m-1762516800"
                           },
+                          "event_slug": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "The event slug this market belongs to, or null if not associated with an event",
+                            "example": "presidential-election-winner-2028"
+                          },
                           "condition_id": {
                             "type": "string",
                             "example": "0x6876ac2b6174778c973c118aac287c49057c4d5360f896729209fe985a2c07fb"
@@ -1486,6 +1521,18 @@
                             "type": "string",
                             "description": "URL to the market image",
                             "example": "https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png"
+                          },
+                          "description": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Detailed description of the market, or null if no description is available",
+                            "example": "This market resolves to \"Yes\" if Bitcoin's price increases from the start to the end of the 15-minute window, and \"No\" otherwise."
+                          },
+                          "negative_risk_id": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Negative risk identifier for the market, or null if not applicable",
+                            "example": null
                           },
                           "side_a": {
                             "type": "object",
@@ -1796,6 +1843,16 @@
                           "price": {
                             "type": "number",
                             "example": 1
+                          },
+                          "block_number": {
+                            "type": "integer",
+                            "description": "Block number where the activity occurred",
+                            "example": 123456789
+                          },
+                          "log_index": {
+                            "type": "integer",
+                            "description": "Log index of the activity event in the block",
+                            "example": 42
                           },
                           "tx_hash": {
                             "type": "string",
