@@ -1792,6 +1792,16 @@
             }
           },
           {
+            "name": "game_start_time",
+            "in": "query",
+            "required": false,
+            "description": "Filter events by game start time (Unix timestamp in seconds). Useful for filtering sports events by when the game starts.",
+            "schema": {
+              "type": "integer",
+              "example": 1704067200
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
