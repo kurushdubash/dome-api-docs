@@ -39,12 +39,6 @@
                         "pages": [
                             "order-router/index"
                         ]
-                    },
-                    {
-                        "group": "Endpoints",
-                        "pages": [
-                            "order-router/link-account"
-                        ]
                     }
                 ]
             },
