@@ -2041,6 +2041,235 @@
         }
       }
     },
+    "/polymarket/event/{event_slug}": {
+      "parameters": [
+        {
+          "name": "event_slug",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier (slug) for the event",
+          "schema": {
+            "type": "string",
+            "example": "2024-us-presidential-election"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getEventDetail",
+        "summary": "Get Event Detail",
+        "description": "Fetches detailed information about a single event by its slug, including event-level metadata and the full list of markets belonging to that event.\n\n**Example Request:**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/event/2024-us-presidential-election'\n```",
+        "responses": {
+          "200": {
+            "description": "Event detail response with markets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "event_slug": {
+                      "type": "string",
+                      "description": "Unique identifier for the event",
+                      "example": "2024-us-presidential-election"
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Event title",
+                      "example": "2024 US Presidential Election"
+                    },
+                    "subtitle": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Event subtitle or detailed description/rules",
+                      "example": "Who will win the 2024 US Presidential Election?"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["open", "closed"],
+                      "description": "Event status - 'closed' only when ALL markets are closed",
+                      "example": "closed"
+                    },
+                    "start_time": {
+                      "type": "integer",
+                      "description": "Unix timestamp (seconds) of earliest market start time",
+                      "example": 1704067200
+                    },
+                    "end_time": {
+                      "type": "integer",
+                      "description": "Unix timestamp (seconds) of latest market end time",
+                      "example": 1730419200
+                    },
+                    "volume_fiat_amount": {
+                      "type": "number",
+                      "description": "Total trading volume in USD across all markets",
+                      "example": 3500000000.50
+                    },
+                    "settlement_sources": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "URL to the resolution/settlement source",
+                      "example": "https://www.ap.org/elections"
+                    },
+                    "rules_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "URL to the event rules/details page",
+                      "example": "https://polymarket.com/event/2024-us-presidential-election"
+                    },
+                    "markets": {
+                      "type": "array",
+                      "description": "Full list of markets belonging to this event",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "market_slug": {
+                            "type": "string",
+                            "example": "will-donald-trump-win-the-2024-us-presidential-election"
+                          },
+                          "title": {
+                            "type": "string",
+                            "example": "Will Donald Trump win the 2024 US Presidential Election?"
+                          },
+                          "condition_id": {
+                            "type": "string",
+                            "example": "0x7ad403c3508f8e3912940fd1a913f227591145ca0614074208e0b962d5fcc422"
+                          },
+                          "start_time": {
+                            "type": "integer",
+                            "example": 1704067200
+                          },
+                          "end_time": {
+                            "type": "integer",
+                            "example": 1730419200
+                          },
+                          "close_time": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "Unix timestamp when market was closed/resolved (null if still open)",
+                            "example": 1730505600
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["open", "closed"],
+                            "example": "closed"
+                          },
+                          "volume_total": {
+                            "type": "number",
+                            "description": "Total trading volume for this market",
+                            "example": 1500000000.25
+                          },
+                          "resolution_source": {
+                            "type": "string",
+                            "example": "https://www.ap.org/elections"
+                          },
+                          "side_a": {
+                            "type": "object",
+                            "properties": {
+                              "id": { "type": "string" },
+                              "label": { "type": "string", "example": "Yes" }
+                            }
+                          },
+                          "side_b": {
+                            "type": "object",
+                            "properties": {
+                              "id": { "type": "string" },
+                              "label": { "type": "string", "example": "No" }
+                            }
+                          },
+                          "winning_side": {
+                            "type": "object",
+                            "nullable": true,
+                            "description": "The winning side if market is resolved",
+                            "properties": {
+                              "id": { "type": "string" },
+                              "label": { "type": "string", "example": "Yes" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": ["event_slug", "title", "status", "start_time", "end_time", "volume_fiat_amount", "markets"]
+                },
+                "example": {
+                  "event_slug": "2024-us-presidential-election",
+                  "title": "2024 US Presidential Election",
+                  "subtitle": "Who will win the 2024 US Presidential Election?",
+                  "status": "closed",
+                  "start_time": 1704067200,
+                  "end_time": 1730419200,
+                  "volume_fiat_amount": 3500000000.50,
+                  "settlement_sources": "https://www.ap.org/elections",
+                  "rules_url": "https://polymarket.com/event/2024-us-presidential-election",
+                  "markets": [
+                    {
+                      "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
+                      "title": "Will Donald Trump win the 2024 US Presidential Election?",
+                      "condition_id": "0x7ad403c3508f8e3912940fd1a913f227591145ca0614074208e0b962d5fcc422",
+                      "start_time": 1704067200,
+                      "end_time": 1730419200,
+                      "close_time": 1730505600,
+                      "status": "closed",
+                      "volume_total": 1500000000.25,
+                      "resolution_source": "https://www.ap.org/elections",
+                      "side_a": { "id": "12345", "label": "Yes" },
+                      "side_b": { "id": "67890", "label": "No" },
+                      "winning_side": { "id": "12345", "label": "Yes" }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Not Found"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No event found with slug: invalid-event-slug"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Failed to fetch event details"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-mint": {
+          "metadata": {
+            "title": "Event Detail",
+            "description": "Get detailed information about a single event including all its markets"
+          },
+          "href": "/api-reference/endpoint/get-event-detail"
+        }
+      }
+    },
     "/polymarket/activity": {
       "get": {
         "operationId": "getActivity",
