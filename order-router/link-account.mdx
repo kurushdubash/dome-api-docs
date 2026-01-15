@@ -424,6 +424,124 @@ db.store_credentials(
 
 ---
 
+## Set Allowances (Safe Wallets Only)
+
+**`POST /link/setAllowances`**
+
+For Safe wallets, USDC allowances must be set before trading. If `/link/prepare` returns `hasAllowances: false` in the `safeInfo`, call this endpoint to set the required approvals.
+
+<Note>
+This endpoint only works for Safe wallets that are already deployed. If `isDeployed: false`, the Safe must be deployed first (either by funding it or enabling `autoDeploySafe: true` in `/link/prepare`).
+</Note>
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://order-router.domeapi.io/link/setAllowances \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "setAllowances",
+    "id": "req-3",
+    "params": {
+      "walletAddress": "0x1234567890123456789012345678901234567890",
+      "signature": "0x1234...abcd",
+      "chainId": 137
+    }
+  }'
+```
+
+```typescript TypeScript
+// First, sign a message to prove ownership of the EOA
+const message = "Approve USDC allowances for trading";
+const signature = await signer.signMessage(message);
+
+const response = await fetch('https://order-router.domeapi.io/link/setAllowances', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    jsonrpc: '2.0',
+    method: 'setAllowances',
+    id: 'req-3',
+    params: {
+      walletAddress: userWalletAddress,
+      signature: signature,
+      chainId: 137,
+    },
+  }),
+});
+
+const data = await response.json();
+
+if (data.result?.success) {
+  console.log('Allowances set for:', data.result.safeAddress);
+  console.log('Allowances set:', data.result.allowancesSet);
+}
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://order-router.domeapi.io/link/setAllowances',
+    json={
+        'jsonrpc': '2.0',
+        'method': 'setAllowances',
+        'id': 'req-3',
+        'params': {
+            'walletAddress': wallet_address,
+            'signature': signature,
+            'chainId': 137,
+        },
+    },
+)
+
+data = response.json()
+if data.get('result', {}).get('success'):
+    print(f"Allowances set for: {data['result']['safeAddress']}")
+```
+
+</CodeGroup>
+
+**Request Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `walletAddress` | `string` | Yes | - | User's EOA wallet address (the Safe owner) |
+| `signature` | `string` | Yes | - | Signature proving ownership of the EOA |
+| `chainId` | `number` | No | `137` | Chain ID (137 = Polygon mainnet) |
+
+**Success Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-3",
+  "result": {
+    "success": true,
+    "safeAddress": "0xABCD...",
+    "allowancesSet": ["CTF_EXCHANGE", "NEG_RISK_CTF_EXCHANGE", "NEG_RISK_ADAPTER"],
+    "transactionId": "0x..."
+  }
+}
+```
+
+**Response when allowances already set:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-3",
+  "result": {
+    "success": true,
+    "safeAddress": "0xABCD...",
+    "allowancesSet": []
+  }
+}
+```
+
+---
+
 ## Complete Direct Endpoint Example
 
 Full example for TEE/mobile environments:
@@ -530,6 +648,7 @@ curl https://order-router.domeapi.io/link/health
 | `2005` | `CREDENTIAL_DERIVATION_FAILED` | Failed to derive credentials from Polymarket |
 | `2006` | `SAFE_DEPLOYMENT_FAILED` | Safe wallet deployment failed |
 | `2007` | `SAFE_NOT_DEPLOYED` | Safe wallet not deployed and autoDeploySafe=false |
+| `2009` | `ALLOWANCE_SET_FAILED` | Failed to set allowances on Safe wallet |
 
 ### Error Response Example
 
