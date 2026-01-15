@@ -33,20 +33,7 @@
         "tabs": [
             {
                 "tab": "Order Router",
-                "groups": [
-                    {
-                        "group": "Getting Started",
-                        "pages": [
-                            "order-router/index"
-                        ]
-                    },
-                    {
-                        "group": "Endpoints",
-                        "pages": [
-                            "order-router/link-account"
-                        ]
-                    }
-                ]
+                "href": "/order-router"
             },
             {
                 "tab": "API",
