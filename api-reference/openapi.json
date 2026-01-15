@@ -2050,14 +2050,14 @@
           "description": "The unique identifier (slug) for the event",
           "schema": {
             "type": "string",
-            "example": "2024-us-presidential-election"
+            "example": "presidential-election-winner-2024"
           }
         }
       ],
       "get": {
         "operationId": "getEventDetail",
         "summary": "Get Event Detail",
-        "description": "Fetches detailed information about a single event by its slug, including event-level metadata and the full list of markets belonging to that event.\n\n**Example Request:**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/event/2024-us-presidential-election'\n```",
+        "description": "Fetches detailed information about a single event by its slug, including event-level metadata and the full list of markets belonging to that event.\n\n**Example Request:**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/event/presidential-election-winner-2024'\n```",
         "responses": {
           "200": {
             "description": "Event detail response with markets",
@@ -2069,7 +2069,7 @@
                     "event_slug": {
                       "type": "string",
                       "description": "Unique identifier for the event",
-                      "example": "2024-us-presidential-election"
+                      "example": "presidential-election-winner-2024"
                     },
                     "title": {
                       "type": "string",
@@ -2113,7 +2113,7 @@
                       "type": "string",
                       "nullable": true,
                       "description": "URL to the event rules/details page",
-                      "example": "https://polymarket.com/event/2024-us-presidential-election"
+                      "example": "https://polymarket.com/event/presidential-election-winner-2024"
                     },
                     "markets": {
                       "type": "array",
@@ -2191,29 +2191,29 @@
                   "required": ["event_slug", "title", "status", "start_time", "end_time", "volume_fiat_amount", "markets"]
                 },
                 "example": {
-                  "event_slug": "2024-us-presidential-election",
-                  "title": "2024 US Presidential Election",
-                  "subtitle": "Who will win the 2024 US Presidential Election?",
+                  "event_slug": "presidential-election-winner-2024",
+                  "title": "Presidential Election Winner 2024",
+                  "subtitle": "This is a market on predicting the winner of the 2024 presidential election.",
                   "status": "closed",
-                  "start_time": 1704067200,
-                  "end_time": 1730419200,
-                  "volume_fiat_amount": 3500000000.50,
-                  "settlement_sources": "https://www.ap.org/elections",
-                  "rules_url": "https://polymarket.com/event/2024-us-presidential-election",
+                  "start_time": 1704409080,
+                  "end_time": 1730808000,
+                  "volume_fiat_amount": 3686335059.30,
+                  "settlement_sources": null,
+                  "rules_url": "https://polymarket.com/event/presidential-election-winner-2024",
                   "markets": [
                     {
                       "market_slug": "will-donald-trump-win-the-2024-us-presidential-election",
                       "title": "Will Donald Trump win the 2024 US Presidential Election?",
-                      "condition_id": "0x7ad403c3508f8e3912940fd1a913f227591145ca0614074208e0b962d5fcc422",
-                      "start_time": 1704067200,
-                      "end_time": 1730419200,
-                      "close_time": 1730505600,
+                      "condition_id": "0xdd22472e552920b8438158ea7238bfadfa4f736aa4cee91a6b86c39ead110917",
+                      "start_time": 1704409080,
+                      "end_time": 1730808000,
+                      "close_time": 1730906261,
                       "status": "closed",
-                      "volume_total": 1500000000.25,
-                      "resolution_source": "https://www.ap.org/elections",
-                      "side_a": { "id": "12345", "label": "Yes" },
-                      "side_b": { "id": "67890", "label": "No" },
-                      "winning_side": { "id": "12345", "label": "Yes" }
+                      "volume_total": 3686335059.30,
+                      "resolution_source": "",
+                      "side_a": { "id": "21742633143463906290569050155826241533067272736897614950488156847949938836455", "label": "Yes" },
+                      "side_b": { "id": "48331043336612883890938759509493159234755048973500640148014422747788308965732", "label": "No" },
+                      "winning_side": { "id": "21742633143463906290569050155826241533067272736897614950488156847949938836455", "label": "Yes" }
                     }
                   ]
                 }
