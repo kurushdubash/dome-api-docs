@@ -1722,8 +1722,18 @@
       "get": {
         "operationId": "getEvents",
         "summary": "Get Events",
-        "description": "Fetches events (groups of related markets) with optional filtering by tags/categories and status. Events aggregate multiple markets under a single topic (e.g., 'Presidential Election 2024' contains multiple candidate markets). Returns events ordered by total volume (most popular first).\n\n**Example Request:**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/events?tags=sports&status=open&limit=10'\n```\n\n**Example Request (with markets included):**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/events?include_markets=true&limit=5'\n```",
+        "description": "Fetches events (groups of related markets) with optional filtering by event_slug, tags/categories and status. Events aggregate multiple markets under a single topic (e.g., 'Presidential Election 2024' contains multiple candidate markets). Returns events ordered by total volume (most popular first).\n\n**Example Request (single event by slug):**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/events?event_slug=presidential-election-winner-2024&include_markets=true'\n```\n\n**Example Request (filter by tags):**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/events?tags=sports&status=open&limit=10'\n```\n\n**Example Request (with markets included):**\n```bash\ncurl 'https://api.domeapi.io/v1/polymarket/events?include_markets=true&limit=5'\n```",
         "parameters": [
+          {
+            "name": "event_slug",
+            "in": "query",
+            "required": false,
+            "description": "Filter by specific event slug. When provided, returns a single hydrated event matching that slug (e.g., 'presidential-election-winner-2024'). Use with include_markets=true to get the full event with all its markets.",
+            "schema": {
+              "type": "string",
+              "example": "presidential-election-winner-2024"
+            }
+          },
           {
             "name": "tags",
             "in": "query",
