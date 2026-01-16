@@ -109,6 +109,7 @@
             },
             {
                 "tab": "Order Router",
+                "url": "order-router",
                 "groups": [
                     {
                         "group": "Getting Started",
