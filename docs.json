@@ -45,7 +45,6 @@
                         "pages": [
                             "api-reference/openapi.json get /polymarket/markets",
                             "api-reference/openapi.json get /polymarket/events",
-                            "api-reference/openapi.json get /polymarket/event/{event_slug}",
                             "api-reference/openapi.json get /polymarket/orders",
                             "api-reference/openapi.json get /polymarket/orderbooks",
                             "api-reference/openapi.json get /polymarket/activity",
