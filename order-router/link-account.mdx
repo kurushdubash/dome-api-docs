@@ -16,7 +16,7 @@ The linking flow has two steps:
 ┌─────────────────────────────────────────────────────────────┐
 │  Your App                                    Dome Server    │
 │                                                             │
-│  POST /link/prepare ─────────────────────────►              │
+│  POST /link-prepare ─────────────────────────►              │
 │  { walletAddress, walletType }                              │
 │                                                             │
 │                                 ◄─────────────────────────  │
@@ -24,7 +24,7 @@ The linking flow has two steps:
 │                                                             │
 │  [User signs EIP-712 payload in wallet]                     │
 │                                                             │
-│  POST /link/complete ────────────────────────►              │
+│  POST /link-complete ────────────────────────►              │
 │  { sessionId, signature }                                   │
 │                                                             │
 │                                 ◄─────────────────────────  │
@@ -127,7 +127,7 @@ Content-Type: application/json
 
 ### Step 1: Prepare Session
 
-**`POST /link/prepare`**
+**`POST /link-prepare`**
 
 Request the EIP-712 payload that the user needs to sign.
 
@@ -299,7 +299,7 @@ const signature = await ethereum.request({
 
 ### Step 3: Complete Session
 
-**`POST /link/complete`**
+**`POST /link-complete`**
 
 Submit the signature to derive Polymarket credentials.
 
@@ -382,7 +382,7 @@ db.store_credentials(
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `sessionId` | `string` | Yes | Session ID from `/link/prepare` response |
+| `sessionId` | `string` | Yes | Session ID from `/link-prepare` response |
 | `signature` | `string` | Yes | EIP-712 signature (0x-prefixed hex) |
 
 **Success Response:**
@@ -426,13 +426,17 @@ db.store_credentials(
 
 ## Set Allowances (Safe Wallets Only)
 
-**`POST /link/setAllowances`**
+**`POST /link-set-allowances`**
 
-For Safe wallets, USDC allowances must be set before trading. If `/link/prepare` returns `hasAllowances: false` in the `safeInfo`, call this endpoint to set the required approvals.
+For Safe wallets, USDC allowances must be set before trading. If `/link-prepare` returns `hasAllowances: false` in the `safeInfo`, call this endpoint to set the required approvals.
 
 <Note>
-This endpoint only works for Safe wallets that are already deployed. If `isDeployed: false`, the Safe must be deployed first (either by funding it or enabling `autoDeploySafe: true` in `/link/prepare`).
+This endpoint reuses the `sessionId` from a completed `/link-complete` call. No additional signature is required - the session already proves ownership of the EOA wallet. Call this immediately after `/link-complete` if allowances are missing.
 </Note>
+
+<Warning>
+The session is available for **30 minutes** after `/link-complete`. If the session expires, you'll need to restart the linking flow.
+</Warning>
 
 <CodeGroup>
 
@@ -444,18 +448,13 @@ curl -X POST https://api.domeapi.io/v1/polymarket/link-set-allowances \
     "method": "setAllowances",
     "id": "req-3",
     "params": {
-      "walletAddress": "0x1234567890123456789012345678901234567890",
-      "signature": "0x1234...abcd",
-      "chainId": 137
+      "sessionId": "550e8400-e29b-41d4-a716-446655440000"
     }
   }'
 ```
 
 ```typescript TypeScript
-// First, sign a message to prove ownership of the EOA
-const message = "Approve USDC allowances for trading";
-const signature = await signer.signMessage(message);
-
+// After successful /link-complete, use the same sessionId to set allowances
 const response = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -464,9 +463,7 @@ const response = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allo
     method: 'setAllowances',
     id: 'req-3',
     params: {
-      walletAddress: userWalletAddress,
-      signature: signature,
-      chainId: 137,
+      sessionId: sessionId, // Same sessionId from /link-prepare
     },
   }),
 });
@@ -482,6 +479,7 @@ if (data.result?.success) {
 ```python Python
 import requests
 
+# After successful /link-complete, use the same session_id
 response = requests.post(
     'https://api.domeapi.io/v1/polymarket/link-set-allowances',
     json={
@@ -489,9 +487,7 @@ response = requests.post(
         'method': 'setAllowances',
         'id': 'req-3',
         'params': {
-            'walletAddress': wallet_address,
-            'signature': signature,
-            'chainId': 137,
+            'sessionId': session_id,  # Same session_id from /link-prepare
         },
     },
 )
@@ -507,8 +503,7 @@ if data.get('result', {}).get('success'):
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `walletAddress` | `string` | Yes | - | User's EOA wallet address (the Safe owner) |
-| `signature` | `string` | Yes | - | Signature proving ownership of the EOA |
+| `sessionId` | `string` | Yes | - | Session ID from a completed `/link-complete` call |
 | `chainId` | `number` | No | `137` | Chain ID (137 = Polygon mainnet) |
 
 **Success Response:**
@@ -611,7 +606,7 @@ console.log('Account linked successfully!');
 
 ## Health Check
 
-**`GET /link/health`**
+**`GET /link-health`**
 
 Check the link service status.
 
@@ -643,7 +638,7 @@ curl https://api.domeapi.io/v1/polymarket/link-health
 | `-32602` | `INVALID_PARAMS` | Invalid parameters |
 | `2001` | `INVALID_WALLET_ADDRESS` | Invalid wallet address format |
 | `2002` | `SESSION_NOT_FOUND` | Session ID not found |
-| `2003` | `SESSION_EXPIRED` | Session expired (10 minute TTL) |
+| `2003` | `SESSION_EXPIRED` | Session expired (10 min incomplete, 30 min after completion) |
 | `2004` | `INVALID_SIGNATURE` | Signature verification failed |
 | `2005` | `CREDENTIAL_DERIVATION_FAILED` | Failed to derive credentials from Polymarket |
 | `2006` | `SAFE_DEPLOYMENT_FAILED` | Safe wallet deployment failed |
@@ -703,17 +698,18 @@ if (data.error) {
 
 ## Session Lifecycle
 
-- Sessions expire after **10 minutes**
-- Each session can only be completed **once**
-- After successful completion, credentials are returned and session is deleted
-- If a session expires, call `/link/prepare` again to start a new session
+- Incomplete sessions expire after **10 minutes**
+- Completed sessions are kept for **30 minutes** (for `/link-set-allowances`)
+- Each session can only be completed **once** via `/link-complete`
+- After successful `/link-complete`, the session remains available for `/link-set-allowances`
+- If a session expires, call `/link-prepare` again to start a new session
 
 ---
 
 ## Security Considerations
 
 1. **Store credentials securely** - Encrypt `apiSecret` and `apiPassphrase` at rest
-2. **Session IDs are single-use** - Cannot replay `/link/complete` with same sessionId
+2. **Session IDs are single-use** - Cannot replay `/link-complete` with same sessionId
 3. **Signature verification** - Server verifies the signature matches the wallet address
 4. **No private keys transmitted** - Only the signature is sent to the server
 
