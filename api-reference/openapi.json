@@ -828,10 +828,11 @@
             "name": "offset",
             "in": "query",
             "required": false,
-            "description": "Number of orders to skip for pagination",
+            "description": "Number of orders to skip for pagination. Maximum value is 100,000. For larger datasets, use filters (condition_id, market_id, token_id, or user) to narrow results.",
             "schema": {
               "type": "integer",
               "minimum": 0,
+              "maximum": 100000,
               "default": 0,
               "example": 0
             }
@@ -1015,6 +1016,13 @@
                     "value": {
                       "error": "Invalid offset parameter",
                       "message": "offset must be a non-negative number"
+                    }
+                  },
+                  "offset_too_large": {
+                    "summary": "Offset too large",
+                    "value": {
+                      "error": "Offset too large",
+                      "message": "offset cannot exceed 100,000. For large datasets, use filters (condition_id, market_id, token_id, or user) to narrow results, or contact support for bulk data access."
                     }
                   },
                   "missing_required_filter": {
@@ -2135,10 +2143,11 @@
             "name": "offset",
             "in": "query",
             "required": false,
-            "description": "Number of activities to skip for pagination",
+            "description": "Number of activities to skip for pagination. Maximum value is 100,000. For larger datasets, use filters (condition_id, market_slug, or user) to narrow results.",
             "schema": {
               "type": "integer",
               "minimum": 0,
+              "maximum": 100000,
               "default": 0,
               "example": 0
             }
@@ -2313,6 +2322,13 @@
                     "value": {
                       "error": "Invalid offset parameter",
                       "message": "offset must be a non-negative number"
+                    }
+                  },
+                  "offset_too_large": {
+                    "summary": "Offset too large",
+                    "value": {
+                      "error": "Offset too large",
+                      "message": "offset cannot exceed 100,000. For large datasets, use filters (condition_id, market_slug, or user) to narrow results, or contact support for bulk data access."
                     }
                   },
                   "invalid_filter_combination": {
