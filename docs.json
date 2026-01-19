@@ -121,6 +121,12 @@
                         "pages": [
                             "order-router/link-account"
                         ]
+                    },
+                    {
+                        "group": "Features",
+                        "pages": [
+                            "order-router/fee-escrow"
+                        ]
                     }
                 ]
             },

@@ -1,0 +1,377 @@
+---
+title: "Fee Escrow"
+description: "Optional fee collection with the Order Router"
+---
+
+The Fee Escrow feature allows platforms to collect fees on orders placed through the Order Router. Fees are held in escrow and distributed upon order fills, with automatic refunds on cancellations.
+
+<Note>
+Fee Escrow is an **opt-in feature**. Orders without fee authorization work exactly as before.
+</Note>
+
+## How It Works
+
+```
+1. User signs a fee authorization (EIP-712)
+2. SDK includes fee auth in order request
+3. Dome server pulls fee to escrow contract
+4. Order placed on Polymarket
+5. On fill: Fee distributed to platform + affiliate
+6. On cancel: Remaining fee refunded to user
+```
+
+## Prerequisites
+
+- `@dome-api/sdk` version 2.0.0 or later
+- USDC.e approval for the escrow contract on Polygon
+- Platform integration with Dome's fee system
+
+## Quick Start
+
+### Using the SDK
+
+Use `PolymarketRouterWithEscrow` instead of `PolymarketRouter`:
+
+```typescript
+import { PolymarketRouterWithEscrow } from '@dome-api/sdk';
+
+const router = new PolymarketRouterWithEscrow({
+  apiKey: process.env.DOME_API_KEY,
+  chainId: 137,
+  escrow: {
+    feeBps: 25,  // 0.25% fee
+  },
+});
+
+// Place orders - fee escrow is automatic
+const order = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '104173...',
+    side: 'buy',
+    size: 100,
+    price: 0.50,
+    signer,
+  },
+  credentials
+);
+
+// Response includes escrow info
+console.log(order.escrowOrderId);   // Unique escrow order ID
+console.log(order.feePulled);       // true
+console.log(order.feeAmount);       // "12500" (0.0125 USDC for $50 order)
+console.log(order.pullFeeTxHash);   // "0x..." transaction hash
+```
+
+### Skip Escrow for Specific Orders
+
+```typescript
+const order = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '104173...',
+    side: 'buy',
+    size: 100,
+    price: 0.50,
+    signer,
+    skipEscrow: true,  // Skip fee escrow for this order
+  },
+  credentials
+);
+```
+
+## REST Endpoint
+
+If using the REST API directly, include `feeAuth` in your request:
+
+### Request with Fee Authorization
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "placeOrder",
+  "id": "unique-request-id",
+  "params": {
+    "signedOrder": {
+      "salt": "123456789",
+      "maker": "0x...",
+      "signer": "0x...",
+      "taker": "0x0000000000000000000000000000000000000000",
+      "tokenId": "104173...",
+      "makerAmount": "50000000",
+      "takerAmount": "100000000",
+      "expiration": "0",
+      "nonce": "0",
+      "feeRateBps": "0",
+      "side": "BUY",
+      "signatureType": 0,
+      "signature": "0x..."
+    },
+    "orderType": "GTC",
+    "credentials": {
+      "apiKey": "your-polymarket-api-key",
+      "apiSecret": "your-polymarket-api-secret",
+      "apiPassphrase": "your-polymarket-passphrase"
+    },
+    "clientOrderId": "unique-client-order-id",
+    "feeAuth": {
+      "orderId": "0x...",
+      "payer": "0x...",
+      "feeAmount": "12500",
+      "deadline": 1704067200,
+      "signature": "0x..."
+    },
+    "payerAddress": "0x...",
+    "signerAddress": "0x..."
+  }
+}
+```
+
+### Response with Escrow Info
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "unique-request-id",
+  "result": {
+    "success": true,
+    "orderId": "order-id-from-polymarket",
+    "clientOrderId": "unique-client-order-id",
+    "status": "LIVE",
+    "orderHash": "0x...",
+    "transactionHashes": ["0x..."],
+    "metadata": {
+      "region": "us-east-1",
+      "latencyMs": 125,
+      "timestamp": 1704067200000
+    },
+    "escrowOrderId": "0x...",
+    "feePulled": true,
+    "feeAmount": "12500",
+    "pullFeeTxHash": "0x..."
+  }
+}
+```
+
+## Fee Authorization Structure
+
+The `feeAuth` object contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `orderId` | `string` | Unique 32-byte order identifier (0x-prefixed hex) |
+| `payer` | `string` | Address paying the fee |
+| `feeAmount` | `string` | Fee amount in USDC (6 decimals) |
+| `deadline` | `number` | Unix timestamp when authorization expires |
+| `signature` | `string` | EIP-712 signature from payer |
+
+### Additional Required Fields
+
+When `feeAuth` is present, these fields are also required:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `payerAddress` | `string` | Must match `feeAuth.payer` |
+| `signerAddress` | `string` | Address that signed the order |
+
+## EIP-712 Signing
+
+The fee authorization uses EIP-712 typed structured data:
+
+```typescript
+const domain = {
+  name: 'DomeFeeEscrow',
+  version: '1',
+  chainId: 137,
+  verifyingContract: '0x989876083eD929BE583b8138e40D469ea3E53a37',
+};
+
+const types = {
+  FeeAuthorization: [
+    { name: 'orderId', type: 'bytes32' },
+    { name: 'payer', type: 'address' },
+    { name: 'feeAmount', type: 'uint256' },
+    { name: 'deadline', type: 'uint256' },
+  ],
+};
+
+const value = {
+  orderId: '0x...',
+  payer: '0x...',
+  feeAmount: BigInt('12500'),
+  deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
+};
+
+const signature = await signer.signTypedData(domain, types, value);
+```
+
+## SDK Utilities
+
+The SDK provides utilities for working with fee escrow:
+
+### Generate Order ID
+
+```typescript
+import { generateOrderId, parseUsdc } from '@dome-api/sdk';
+
+const orderId = generateOrderId({
+  chainId: 137,
+  userAddress: '0x...',
+  marketId: '104173...',
+  side: 'buy',
+  size: parseUsdc(50),  // $50 in USDC
+  price: 0.50,
+  timestamp: Date.now(),
+});
+```
+
+### Create Fee Authorization
+
+```typescript
+import { createFeeAuthorization, calculateFee, parseUsdc } from '@dome-api/sdk';
+
+const orderSize = parseUsdc(50);  // $50
+const feeAmount = calculateFee(orderSize, BigInt(25));  // 0.25% = $0.125
+
+const feeAuth = createFeeAuthorization(
+  orderId,
+  payerAddress,
+  feeAmount,
+  3600  // 1 hour deadline
+);
+```
+
+### Sign Fee Authorization
+
+```typescript
+import { signFeeAuthorization } from '@dome-api/sdk';
+
+const signedAuth = await signFeeAuthorization(
+  signer,
+  '0x989876083eD929BE583b8138e40D469ea3E53a37',  // escrow contract
+  feeAuth,
+  137  // chainId
+);
+```
+
+## Escrow Configuration
+
+Configure escrow settings when initializing the router:
+
+```typescript
+const router = new PolymarketRouterWithEscrow({
+  apiKey: process.env.DOME_API_KEY,
+  chainId: 137,
+  escrow: {
+    feeBps: 25,           // Fee in basis points (25 = 0.25%)
+    deadlineSeconds: 3600, // Authorization validity (default: 1 hour)
+    affiliate: '0x...',    // Optional affiliate address for fee sharing
+  },
+});
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `feeBps` | `number` | `25` | Fee in basis points (0.25%) |
+| `deadlineSeconds` | `number` | `3600` | How long fee auth is valid |
+| `affiliate` | `string` | `0x0...0` | Affiliate address for fee split |
+| `escrowAddress` | `string` | (mainnet) | Escrow contract address |
+
+## Error Codes
+
+Fee escrow-specific error codes:
+
+| Code | Name | Description |
+|------|------|-------------|
+| `2001` | `MISSING_FEE_ESCROW_FIELDS` | `feeAuth` present but missing `payerAddress` or `signerAddress` |
+| `2002` | `INVALID_PAYER_ADDRESS` | `payerAddress` doesn't match `feeAuth.payer` |
+| `2003` | `FEE_TOO_LOW` | Fee amount below minimum threshold |
+| `2004` | `DEADLINE_EXPIRED` | Fee authorization has expired |
+| `2005` | `PULL_FEE_FAILED` | On-chain `pullFee()` transaction failed |
+
+### Error Response Example
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "unique-request-id",
+  "error": {
+    "code": 2004,
+    "message": "DEADLINE_EXPIRED",
+    "data": {
+      "reason": "Fee authorization deadline has passed"
+    }
+  }
+}
+```
+
+## Escrow Contract
+
+The fee escrow contract is deployed on Polygon mainnet:
+
+**Address:** `0x989876083eD929BE583b8138e40D469ea3E53a37`
+
+### Contract Functions
+
+| Function | Description |
+|----------|-------------|
+| `pullFee(feeAuth, affiliate)` | Pull fee from user to escrow |
+| `distribute(orderId, amount)` | Distribute fee on order fill |
+| `refund(orderId)` | Refund remaining fee on cancel |
+
+### USDC Approval
+
+Users must approve the escrow contract to spend their USDC.e:
+
+```typescript
+const USDC_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+const ESCROW_ADDRESS = '0x989876083eD929BE583b8138e40D469ea3E53a37';
+
+// Approve escrow contract to spend USDC
+await usdcContract.approve(ESCROW_ADDRESS, ethers.constants.MaxUint256);
+```
+
+## Backward Compatibility
+
+Orders without `feeAuth` work exactly as before:
+
+```typescript
+// No feeAuth = no fee escrow
+const order = await router.placeOrder(
+  {
+    userId: 'user-123',
+    marketId: '104173...',
+    side: 'buy',
+    size: 100,
+    price: 0.50,
+    signer,
+    // No feeAuth, payerAddress, or signerAddress
+  },
+  credentials
+);
+
+// Response has no escrow fields
+console.log(order.escrowOrderId);  // undefined
+```
+
+## FAQ
+
+**Q: Is fee escrow required?**
+
+No, it's opt-in. Orders without `feeAuth` work normally.
+
+**Q: What happens if the order is cancelled?**
+
+The fee is refunded to the payer via the escrow contract.
+
+**Q: What's the minimum fee?**
+
+Fees must be at least 0.01% of order size to prevent dust.
+
+**Q: How do I become an affiliate?**
+
+Contact [support@domeapi.com](mailto:support@domeapi.com) to set up affiliate fee sharing.
+
+**Q: Can I use a different escrow contract?**
+
+Custom escrow contracts can be configured - contact support for enterprise setups.
