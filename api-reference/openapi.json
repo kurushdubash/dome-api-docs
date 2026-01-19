@@ -825,16 +825,13 @@
             }
           },
           {
-            "name": "offset",
+            "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "Number of orders to skip for pagination. Maximum value is 100,000. For larger datasets, use filters (condition_id, market_id, token_id, or user) to narrow results.",
+            "description": "Base64-encoded cursor for efficient pagination. Returned in the previous response's pagination object.",
             "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100000,
-              "default": 0,
-              "example": 0
+              "type": "string",
+              "example": "eyJibG9ja190aW1lc3RhbXAiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJ0eF9oYXNoIjoiMHgxMjM0NTY3ODkwYWJjZGVmIiwibG9nX2luZGV4IjoxMCwidG90YWwiOjUxMDk2MTl9"
             }
           },
           {
@@ -964,6 +961,11 @@
                           "type": "boolean",
                           "description": "Whether there are more orders available",
                           "example": true
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "description": "Base64-encoded cursor for the next page. Only present when there are more results. Use this in the next request instead of offset.",
+                          "example": "eyJibG9ja190aW1lc3RhbXAiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJ0eF9oYXNoIjoiMHgxMjM0NTY3ODkwYWJjZGVmIiwibG9nX2luZGV4IjoxMCwidG90YWwiOjUxMDk2MTl9"
                         }
                       }
                     }
@@ -1011,20 +1013,6 @@
                       "message": "limit must be a number between 1 and 1000"
                     }
                   },
-                  "invalid_offset": {
-                    "summary": "Invalid offset",
-                    "value": {
-                      "error": "Invalid offset parameter",
-                      "message": "offset must be a non-negative number"
-                    }
-                  },
-                  "offset_too_large": {
-                    "summary": "Offset too large",
-                    "value": {
-                      "error": "Offset too large",
-                      "message": "offset cannot exceed 100,000. For large datasets, use filters (condition_id, market_id, token_id, or user) to narrow results, or contact support for bulk data access."
-                    }
-                  },
                   "missing_required_filter": {
                     "summary": "Missing required filter",
                     "value": {
@@ -1037,6 +1025,37 @@
                     "value": {
                       "error": "Invalid filter combination",
                       "message": "Only one of market_slug, token_id, or condition_id can be provided"
+                    }
+                  },
+                  "invalid_pagination_key": {
+                    "summary": "Invalid pagination key",
+                    "value": {
+                      "error": "Invalid pagination key",
+                      "message": "pagination_key is invalid or corrupted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Offset deprecated for large values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Offset deprecated"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Offsets greater than 10,000 are no longer supported. Please use pagination_key for efficient pagination."
+                    },
+                    "docs": {
+                      "type": "string",
+                      "example": "https://docs.domeapi.io/pagination"
                     }
                   }
                 }
