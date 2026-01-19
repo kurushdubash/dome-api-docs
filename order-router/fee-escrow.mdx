@@ -337,6 +337,54 @@ const ESCROW_ADDRESS = '0x989876083eD929BE583b8138e40D469ea3E53a37';
 await usdcContract.approve(ESCROW_ADDRESS, ethers.constants.MaxUint256);
 ```
 
+## Fee Distribution
+
+After an order is placed with fee escrow, the Dome server automatically handles fee distribution and refunds based on order status.
+
+### How Distribution Works
+
+The server runs a background process that:
+
+1. **Monitors order status** - Checks Polymarket for fill status every 5 minutes
+2. **Distributes on fill** - Calls `distribute()` when orders are fully or partially filled
+3. **Refunds on cancel** - Calls `refund()` when orders are cancelled
+
+```
+Order Lifecycle:
+
+   ┌─────────────┐     ┌─────────────────┐     ┌──────────────┐
+   │   pending   │────▶│ partially_filled │────▶│  distributed │
+   └─────────────┘     └─────────────────┘     └──────────────┘
+          │                    │
+          │                    │ (cancel)
+          ▼                    ▼
+   ┌───────────────────────────────────────┐
+   │              refunded                 │
+   └───────────────────────────────────────┘
+```
+
+### Distribution Timing
+
+| Event | Timing |
+|-------|--------|
+| Order placed | Fee pulled immediately |
+| Order filled | Distribution within 5 minutes |
+| Order cancelled | Refund within 5 minutes |
+| Partial fill | Proportional distribution within 5 minutes |
+| Old orders (>24h) not found | Automatic refund |
+
+### Partial Fills
+
+For partially filled orders, fees are distributed proportionally:
+
+- If 50% of an order fills → 50% of fee is distributed
+- Remaining fee stays in escrow until fill or cancel
+- On cancel, remaining fee is refunded to user
+
+<Note>
+Distribution and refund transactions are executed by the Dome operator wallet. Users don't need to take any action after order placement.
+</Note>
+
 ## Backward Compatibility
 
 Orders without `feeAuth` work exactly as before:
