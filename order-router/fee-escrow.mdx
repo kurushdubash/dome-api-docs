@@ -385,6 +385,170 @@ For partially filled orders, fees are distributed proportionally:
 Distribution and refund transactions are executed by the Dome operator wallet. Users don't need to take any action after order placement.
 </Note>
 
+## Order Management Endpoints
+
+The following REST endpoints are available for managing escrow orders.
+
+### Get Escrow Order
+
+Retrieve details of a specific escrow order by ID.
+
+```
+GET /polymarket/escrow/order/:orderId
+```
+
+**Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "order": {
+      "orderId": "0x...",
+      "payer": "0x...",
+      "signer": "0x...",
+      "feeAmount": "12500",
+      "affiliate": "0x...",
+      "status": "pending",
+      "polymarketOrderId": "abc123",
+      "pullFeeTxHash": "0x...",
+      "distributeTxHash": null,
+      "refundTxHash": null,
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
+    }
+  }
+}
+```
+
+### List Escrow Orders
+
+Retrieve a list of escrow orders with optional filters.
+
+```
+GET /polymarket/escrow/orders
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `payer` | `string` | Filter by payer address |
+| `signer` | `string` | Filter by signer address |
+| `status` | `string` | Filter by status (`pending`, `distributed`, `refunded`, `cancelled`) |
+| `limit` | `number` | Max results to return (default: 50, max: 100) |
+| `offset` | `number` | Pagination offset (default: 0) |
+
+**Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "orders": [
+      {
+        "orderId": "0x...",
+        "payer": "0x...",
+        "signer": "0x...",
+        "feeAmount": "12500",
+        "affiliate": "0x...",
+        "status": "pending",
+        "polymarketOrderId": "abc123",
+        "pullFeeTxHash": "0x...",
+        "distributeTxHash": null,
+        "refundTxHash": null,
+        "createdAt": "2024-01-15T10:30:00.000Z",
+        "updatedAt": "2024-01-15T10:30:00.000Z"
+      }
+    ],
+    "total": 1,
+    "limit": 50,
+    "offset": 0
+  }
+}
+```
+
+### Cancel Escrow Order
+
+Cancel an escrow order and initiate a refund. Only callable for orders in `pending` status.
+
+```
+POST /polymarket/escrow/cancel/:orderId
+```
+
+**Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "success": true,
+    "message": "Order cancelled and refund initiated",
+    "orderId": "0x...",
+    "refundTxHash": "0x..."
+  }
+}
+```
+
+### Delete Escrow Order
+
+Cancel an escrow order and remove it from the database. Only callable for orders in `pending` status.
+
+```
+DELETE /polymarket/escrow/order/:orderId
+```
+
+**Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "success": true,
+    "message": "Order cancelled and deleted",
+    "orderId": "0x...",
+    "refundTxHash": "0x..."
+  }
+}
+```
+
+### Order Status Values
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Fee pulled, order placed, awaiting fill or cancel |
+| `distributed` | Order filled, fee distributed to platform/affiliate |
+| `refunded` | Order cancelled, fee refunded to payer |
+| `cancelled` | Order manually cancelled via cancel endpoint |
+
+### Error Responses
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "error": {
+    "code": -32000,
+    "message": "Order not found"
+  }
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "error": {
+    "code": -32001,
+    "message": "Cannot cancel order with status: distributed"
+  }
+}
+```
+
 ## Backward Compatibility
 
 Orders without `feeAuth` work exactly as before:
