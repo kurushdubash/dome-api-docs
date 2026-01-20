@@ -1417,15 +1417,13 @@
             }
           },
           {
-            "name": "offset",
+            "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "Number of markets to skip for pagination",
+            "description": "Base64-encoded cursor for efficient pagination. Returned in the previous response's pagination object. Use this instead of large offsets for better performance.",
             "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "example": 0
+              "type": "string",
+              "example": "eyJzdGFydF9kYXRlIjoiMjAyNi0wMS0xOVQxMjowMDowMC4wMDBaIiwiY29uZGl0aW9uX2lkIjoiMHgxMjM0In0="
             }
           },
           {
@@ -1644,10 +1642,6 @@
                           "type": "integer",
                           "example": 20
                         },
-                        "offset": {
-                          "type": "integer",
-                          "example": 0
-                        },
                         "total": {
                           "type": "integer",
                           "description": "Total number of markets matching the filters",
@@ -1657,6 +1651,11 @@
                           "type": "boolean",
                           "description": "Whether there are more markets available",
                           "example": true
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "description": "Cursor for next page. Only present when has_more is true and using cursor-based pagination.",
+                          "example": "eyJ2b2x1bWVfdG90YWwiOjEyMzQ1LjY3LCJjbG9zZV90aW1lIjpudWxsLCJjb25kaXRpb25faWQiOiIweDEyMzQifQ=="
                         }
                       }
                     }
@@ -1702,13 +1701,6 @@
                     "value": {
                       "error": "Invalid limit parameter",
                       "message": "limit must be a number between 1 and 100"
-                    }
-                  },
-                  "invalid_offset": {
-                    "summary": "Invalid offset",
-                    "value": {
-                      "error": "Invalid offset parameter",
-                      "message": "offset must be a non-negative number"
                     }
                   }
                 }
