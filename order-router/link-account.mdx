@@ -352,6 +352,23 @@ If `safeDeployPayload` was returned in the prepare response, you must also sign 
 
 <CodeGroup>
 
+```typescript Privy (TEE/Mobile)
+// Sign credentials payload
+const signature = await privy.signTypedData({
+  walletId,
+  typedData: eip712Payload,
+});
+
+// If safeDeployPayload exists, sign it too
+let deploymentSignature;
+if (safeDeployPayload) {
+  deploymentSignature = await privy.signTypedData({
+    walletId,
+    typedData: safeDeployPayload,
+  });
+}
+```
+
 ```typescript ethers.js
 // Sign credentials payload
 const signature = await signer._signTypedData(
@@ -728,9 +745,9 @@ await database.savePolymarketCredentials(userId, {
 console.log('Account linked successfully!');
 ```
 
-### Safe Wallet with Auto-Deploy Example
+### Safe Wallet with Auto-Deploy Example (Privy)
 
-Full example for Safe wallets that need to be deployed:
+Full example for Safe wallets that need to be deployed using Privy managed wallets:
 
 ```typescript
 // 1. Prepare - get EIP-712 payloads
@@ -757,21 +774,19 @@ if (prepareData.error) {
 
 const { sessionId, eip712Payload, safeDeployPayload, safeInfo } = prepareData.result;
 
-// 2. Sign credentials payload
-const signature = await signer._signTypedData(
-  eip712Payload.domain,
-  eip712Payload.types,
-  eip712Payload.message
-);
+// 2. Sign credentials payload using Privy
+const signature = await privy.signTypedData({
+  walletId,
+  typedData: eip712Payload,
+});
 
 // 3. If Safe needs deployment, sign the deployment payload
 let deploymentSignature;
 if (safeDeployPayload) {
-  deploymentSignature = await signer._signTypedData(
-    safeDeployPayload.domain,
-    safeDeployPayload.types,
-    safeDeployPayload.message
-  );
+  deploymentSignature = await privy.signTypedData({
+    walletId,
+    typedData: safeDeployPayload,
+  });
 }
 
 // 4. Complete - exchange signatures for credentials (and deploy Safe if needed)
