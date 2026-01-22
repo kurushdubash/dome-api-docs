@@ -283,6 +283,71 @@ const router = new PolymarketRouterWithEscrow({
 | `affiliate` | `string` | `0x0...0` | Affiliate address for fee split |
 | `escrowAddress` | `string` | (mainnet) | Escrow contract address |
 
+## Affiliate Configuration
+
+Affiliates can earn a share of fees collected through the escrow system. There are two ways to configure affiliate addresses:
+
+### Option 1: Per-Request (SDK)
+
+Pass the affiliate address when initializing the router or per-order:
+
+```typescript
+// Set default affiliate for all orders
+const router = new PolymarketRouterWithEscrow({
+  apiKey: process.env.DOME_API_KEY,
+  chainId: 137,
+  escrow: {
+    feeBps: 25,
+    affiliate: '0xYourAffiliateAddress...',
+  },
+});
+
+// Or pass per-order via REST API in request body
+{
+  "params": {
+    ...
+    "affiliate": "0xYourAffiliateAddress..."
+  }
+}
+```
+
+### Option 2: Server-Side (API Key Config)
+
+For a persistent affiliate address tied to your API key, use the User Settings API. This ensures all orders from your API key automatically use your affiliate address, regardless of what the SDK sends.
+
+```bash
+# Set affiliate address for your API key
+curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "affiliateAddress": "0xYourAffiliateAddress..."
+  }'
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Affiliate address updated successfully",
+  "affiliateAddress": "0x...",
+  "note": "Changes are live immediately via Redis"
+}
+```
+
+### Priority Order
+
+When resolving the affiliate address, the system uses this priority:
+
+1. **Server-side config** (from API key settings) - highest priority
+2. **Client-provided** (from `params.affiliate` in request)
+3. **Default affiliate** (environment variable)
+4. **Zero address** (all fees go to Dome)
+
+<Tip>
+Server-side affiliate configuration is recommended for affiliates who want to ensure they always receive their share, as it cannot be overridden by the client.
+</Tip>
+
 ## Error Codes
 
 Fee escrow-specific error codes:
