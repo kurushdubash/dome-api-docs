@@ -1844,15 +1844,13 @@
             }
           },
           {
-            "name": "offset",
+            "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "Number of events to skip for pagination",
+            "description": "Pagination key for cursor-based pagination. Use the value from the previous response's pagination.pagination_key field to get the next page of results. Do not use the deprecated 'offset' parameter.",
             "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "example": 0
+              "type": "string",
+              "example": "eyJsYXN0Vm9sdW1lIjoxNzEyMTMyNjYzLjk2MTYwNjMsImxhc3RFdmVudFNsdWciOiJuYmEtY2hhbXBpb24tMjAyNC0yMDI1In0="
             }
           }
         ],
@@ -1984,21 +1982,19 @@
                       "properties": {
                         "limit": {
                           "type": "integer",
+                          "description": "Number of events returned in this response",
                           "example": 10
-                        },
-                        "offset": {
-                          "type": "integer",
-                          "example": 0
-                        },
-                        "total": {
-                          "type": "integer",
-                          "description": "Total number of events matching the filters",
-                          "example": 500
                         },
                         "has_more": {
                           "type": "boolean",
-                          "description": "Whether there are more events available",
+                          "description": "Whether there are more events available. If true, use pagination_key to fetch the next page.",
                           "example": true
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Pagination key for fetching the next page. Pass this value as the pagination_key query parameter to get the next page of results. Will be null if has_more is false.",
+                          "example": "eyJsYXN0Vm9sdW1lIjoxNzEyMTMyNjYzLjk2MTYwNjMsImxhc3RFdmVudFNsdWciOiJuYmEtY2hhbXBpb24tMjAyNC0yMDI1In0="
                         }
                       }
                     }
