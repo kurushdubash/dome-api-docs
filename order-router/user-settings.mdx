@@ -1,0 +1,142 @@
+---
+title: "User Settings"
+description: "Manage affiliate addresses and fee configurations for your API key"
+---
+
+<Warning>
+**Beta - Use Only If Necessary**
+
+These endpoints are in beta and still being tested. For most use cases, we strongly recommend using the [SDK](/order-router/index) and [quickstart examples](/order-router/index#quick-start), which handle the complex signing logic for you.
+
+Only use these direct endpoints if you have specific requirements that the SDK cannot address.
+</Warning>
+
+The User Settings API allows you to configure affiliate addresses and other settings that persist with your API key. These settings apply to all orders placed using your API key.
+
+## Set Affiliate Address
+
+Configure your affiliate address to receive a share of fees on all orders placed with your API key.
+
+```
+POST /v1/polymarket/users/affiliate
+```
+
+### Request
+
+```bash
+curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "affiliateAddress": "0x58241F4C9C76CD7b8357185BF533fFA266f46916"
+  }'
+```
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `affiliateAddress` | `string` | Yes | Valid Polygon address (0x + 40 hex chars) |
+| `apiKey` | `string` | No | API key to update (defaults to your authenticated key) |
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Affiliate address updated successfully",
+  "affiliateAddress": "0x58241F4C9C76CD7b8357185BF533fFA266f46916",
+  "note": "Changes are live immediately via Redis"
+}
+```
+
+### Error Responses
+
+**Invalid Address Format (400)**
+```json
+{
+  "error": "INVALID_ADDRESS",
+  "message": "affiliateAddress must be a valid Polygon address (0x followed by 40 hex characters)"
+}
+```
+
+**API Key Not Found (404)**
+```json
+{
+  "error": "NOT_FOUND",
+  "message": "API key not found in users.json"
+}
+```
+
+## How It Works
+
+When you set an affiliate address via this API:
+
+1. **Immediate Effect** - The change is written to Redis and takes effect immediately
+2. **Persistence** - The change is also written to S3 for persistence across service restarts
+3. **Priority** - Server-configured affiliate addresses take priority over client-provided values
+
+```
+Order Request Flow:
+
+SDK/Client ──▶ Dome Backend ──▶ Polymarket Router
+                    │
+                    ▼
+           Check API Key Config
+           (Redis: auth:tokens)
+                    │
+                    ▼
+           affiliate_address found?
+           ┌─────────┴─────────┐
+           │                   │
+          Yes                  No
+           │                   │
+           ▼                   ▼
+  Use server affiliate   Use client affiliate
+                         (or default)
+```
+
+## Use Cases
+
+### Affiliate Platforms
+
+If you're building a platform that routes orders through Dome, configure your affiliate address to ensure you receive fee share on all orders:
+
+```bash
+# One-time setup
+curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+  -H "Authorization: Bearer YOUR_PLATFORM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"affiliateAddress": "0xYourPlatformWallet..."}'
+
+# All subsequent orders automatically use your affiliate address
+```
+
+### Multi-Tenant Platforms
+
+If you manage multiple API keys for different users, you can configure each key individually:
+
+```bash
+# Set affiliate for user A
+curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+  -H "Authorization: Bearer ADMIN_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "affiliateAddress": "0xUserAWallet...",
+    "apiKey": "user-a-api-key"
+  }'
+
+# Set affiliate for user B
+curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+  -H "Authorization: Bearer ADMIN_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "affiliateAddress": "0xUserBWallet...",
+    "apiKey": "user-b-api-key"
+  }'
+```
+
+## Related
+
+- [Fee Escrow](/order-router/fee-escrow) - Learn about the fee escrow system
+- [Fee Escrow: Affiliate Configuration](/order-router/fee-escrow#affiliate-configuration) - Alternative ways to set affiliate addresses

@@ -117,9 +117,10 @@
                         ]
                     },
                     {
-                        "group": "Endpoints",
+                        "group": "Endpoints (Beta)",
                         "pages": [
-                            "order-router/link-account"
+                            "order-router/link-account",
+                            "order-router/user-settings"
                         ]
                     },
                     {
