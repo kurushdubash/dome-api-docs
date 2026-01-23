@@ -3,6 +3,14 @@ title: "Link Account"
 description: "Link user wallets to Polymarket to obtain trading credentials"
 ---
 
+<Warning>
+**Beta - Use Only If Necessary**
+
+These endpoints are in beta and still being tested. For most use cases, we strongly recommend using the [SDK's `linkUser()` method](/order-router/index#3-link-user-one-time-setup) instead, which handles the complex signing logic automatically.
+
+Only use these direct endpoints if you have specific requirements like TEE/enclave environments, mobile on-device signing, or custom signing workflows where the SDK cannot be used.
+</Warning>
+
 Account linking creates Polymarket CLOB API credentials for a user's wallet. This is a **one-time setup** required before placing orders. After linking, credentials should be stored in your database for subsequent order placement.
 
 ## Overview
