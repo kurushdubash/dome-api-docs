@@ -1844,15 +1844,13 @@
             }
           },
           {
-            "name": "offset",
+            "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "Number of events to skip for pagination",
+            "description": "Pagination key for cursor-based pagination. Use the value from the previous response's pagination.pagination_key field to get the next page of results. Do not use the deprecated 'offset' parameter.",
             "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "example": 0
+              "type": "string",
+              "example": "eyJsYXN0Vm9sdW1lIjoxNzEyMTMyNjYzLjk2MTYwNjMsImxhc3RFdmVudFNsdWciOiJuYmEtY2hhbXBpb24tMjAyNC0yMDI1In0="
             }
           }
         ],
@@ -1984,21 +1982,19 @@
                       "properties": {
                         "limit": {
                           "type": "integer",
+                          "description": "Number of events returned in this response",
                           "example": 10
-                        },
-                        "offset": {
-                          "type": "integer",
-                          "example": 0
-                        },
-                        "total": {
-                          "type": "integer",
-                          "description": "Total number of events matching the filters",
-                          "example": 500
                         },
                         "has_more": {
                           "type": "boolean",
-                          "description": "Whether there are more events available",
+                          "description": "Whether there are more events available. If true, use pagination_key to fetch the next page.",
                           "example": true
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Pagination key for fetching the next page. Pass this value as the pagination_key query parameter to get the next page of results. Will be null if has_more is false.",
+                          "example": "eyJsYXN0Vm9sdW1lIjoxNzEyMTMyNjYzLjk2MTYwNjMsImxhc3RFdmVudFNsdWciOiJuYmEtY2hhbXBpb24tMjAyNC0yMDI1In0="
                         }
                       }
                     }
@@ -2084,13 +2080,13 @@
       "get": {
         "operationId": "getActivity",
         "summary": "Get Activity",
-        "description": "Fetches activity data for a specific user with optional filtering by market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`.",
+        "description": "Fetches activity data with optional filtering by user, market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`. Supports efficient cursor-based pagination for large datasets.",
         "parameters": [
           {
             "name": "user",
             "in": "query",
-            "required": true,
-            "description": "User wallet address to fetch activity for",
+            "required": false,
+            "description": "User wallet address to fetch activity for. If not provided, returns activity for all users.",
             "schema": {
               "type": "string",
               "pattern": "^0x[0-9a-fA-F]{40}$",
@@ -2151,16 +2147,13 @@
             }
           },
           {
-            "name": "offset",
+            "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "Number of activities to skip for pagination. Maximum value is 100,000. For larger datasets, use filters (condition_id, market_slug, or user) to narrow results.",
+            "description": "Base64-encoded cursor for efficient pagination. Returned in the previous response's pagination object.",
             "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100000,
-              "default": 0,
-              "example": 0
+              "type": "string",
+              "example": "eyJibG9ja190aW1lc3RhbXAiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJzaWRlIjoiU1BMSVQiLCJ0eF9oYXNoIjoiMHgxMjM0NTY3ODkwYWJjZGVmIiwibG9nX2luZGV4IjoxMCwidG90YWwiOjE5ODkwMTc3Nn0="
             }
           }
         ],
@@ -2254,10 +2247,6 @@
                           "type": "integer",
                           "example": 50
                         },
-                        "offset": {
-                          "type": "integer",
-                          "example": 0
-                        },
                         "count": {
                           "type": "integer",
                           "description": "Total number of activities matching the filters",
@@ -2267,6 +2256,11 @@
                           "type": "boolean",
                           "description": "Whether there are more activities available",
                           "example": true
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "description": "Base64-encoded cursor for the next page. Only present when there are more results.",
+                          "example": "eyJibG9ja190aW1lc3RhbXAiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJzaWRlIjoiU1BMSVQiLCJ0eF9oYXNoIjoiMHgxMjM0NTY3ODkwYWJjZGVmIiwibG9nX2luZGV4IjoxMCwidG90YWwiOjE5ODkwMTc3Nn0="
                         }
                       }
                     }
@@ -2293,13 +2287,6 @@
                   }
                 },
                 "examples": {
-                  "missing_user": {
-                    "summary": "Missing required user parameter",
-                    "value": {
-                      "error": "Missing required parameter",
-                      "message": "user parameter is required"
-                    }
-                  },
                   "invalid_start_time": {
                     "summary": "Invalid start_time parameter",
                     "value": {
@@ -2328,18 +2315,11 @@
                       "message": "limit must be a number between 1 and 1000"
                     }
                   },
-                  "invalid_offset": {
-                    "summary": "Invalid offset",
+                  "invalid_pagination_key": {
+                    "summary": "Invalid pagination key",
                     "value": {
-                      "error": "Invalid offset parameter",
-                      "message": "offset must be a non-negative number"
-                    }
-                  },
-                  "offset_too_large": {
-                    "summary": "Offset too large",
-                    "value": {
-                      "error": "Offset too large",
-                      "message": "offset cannot exceed 100,000. For large datasets, use filters (condition_id, market_slug, or user) to narrow results, or contact support for bulk data access."
+                      "error": "Invalid pagination key",
+                      "message": "pagination_key is invalid or corrupted"
                     }
                   },
                   "invalid_filter_combination": {
@@ -2377,7 +2357,7 @@
         "x-mint": {
           "metadata": {
             "title": "Activity",
-            "description": "Fetches activity data for a specific user with optional filtering by market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`."
+            "description": "Fetches activity data with optional filtering by user, market, condition, and time range. Returns trading activity including `MERGES`, `SPLITS`, and `REDEEMS`. Supports efficient cursor-based pagination."
           },
           "href": "/api-reference/endpoint/get-activity"
         }
@@ -2966,15 +2946,13 @@
             }
           },
           {
-            "name": "offset",
+            "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "Number of markets to skip for pagination",
+            "description": "Base64-encoded cursor for efficient pagination. Returned in the previous response's pagination object.",
             "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "example": 0
+              "type": "string",
+              "example": "eyJvcGVuX3RpbWUiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJtYXJrZXRfdGlja2VyIjoiS1hNQVlPUk5ZQ1BBUlRZLTI1LUQiLCJ0b3RhbCI6MTUwfQ=="
             }
           }
         ],
@@ -3062,10 +3040,6 @@
                           "type": "integer",
                           "example": 20
                         },
-                        "offset": {
-                          "type": "integer",
-                          "example": 0
-                        },
                         "total": {
                           "type": "integer",
                           "description": "Total number of markets matching the filters",
@@ -3075,6 +3049,11 @@
                           "type": "boolean",
                           "description": "Whether there are more markets available",
                           "example": true
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "description": "Base64-encoded cursor for the next page. Only present when there are more results.",
+                          "example": "eyJvcGVuX3RpbWUiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJtYXJrZXRfdGlja2VyIjoiS1hNQVlPUk5ZQ1BBUlRZLTI1LUQiLCJ0b3RhbCI6MTUwfQ=="
                         }
                       }
                     }
@@ -3161,15 +3140,13 @@
             }
           },
           {
-            "name": "offset",
+            "name": "pagination_key",
             "in": "query",
             "required": false,
-            "description": "Number of trades to skip for pagination",
+            "description": "Base64-encoded cursor for efficient pagination. Returned in the previous response's pagination object.",
             "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "example": 0
+              "type": "string",
+              "example": "eyJjcmVhdGVkX3RpbWUiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJ0cmFkZV9pZCI6IjEyMzQ1Njc4OTAiLCJ0b3RhbCI6NTAwMDB9"
             }
           }
         ],
@@ -3243,10 +3220,6 @@
                           "type": "integer",
                           "example": 50
                         },
-                        "offset": {
-                          "type": "integer",
-                          "example": 100
-                        },
                         "total": {
                           "type": "integer",
                           "description": "Total number of trades matching the filters",
@@ -3256,6 +3229,11 @@
                           "type": "boolean",
                           "description": "Whether there are more trades available",
                           "example": true
+                        },
+                        "pagination_key": {
+                          "type": "string",
+                          "description": "Base64-encoded cursor for the next page. Only present when there are more results.",
+                          "example": "eyJjcmVhdGVkX3RpbWUiOiIyMDI1LTAxLTE5VDEyOjAwOjAwLjAwMFoiLCJ0cmFkZV9pZCI6IjEyMzQ1Njc4OTAiLCJ0b3RhbCI6NTAwMDB9"
                         }
                       }
                     }
@@ -3340,6 +3318,16 @@
               "default": 100,
               "maximum": 200,
               "example": 100
+            }
+          },
+          {
+            "name": "paginationKey",
+            "in": "query",
+            "required": false,
+            "description": "Base64-encoded cursor for efficient pagination. Returned in the previous response's pagination object.",
+            "schema": {
+              "type": "string",
+              "example": "eyJ0aW1lc3RhbXAiOjE3NjA0NzAwMDAwMDAsInRpY2tlciI6IktYTkZMR0FNRS0yNUFVRzE2QVJJREVOLUFSSSIsInRvdGFsIjoxMDB9"
             }
           }
         ],
@@ -3468,6 +3456,11 @@
                           "type": "integer",
                           "description": "Number of snapshots returned",
                           "example": 4
+                        },
+                        "paginationKey": {
+                          "type": "string",
+                          "description": "Base64-encoded cursor for fetching the next page of results. Only present when has_more is true.",
+                          "example": "eyJ0aW1lc3RhbXAiOjE3NjA0NzAwMDAwMDAsInRpY2tlciI6IktYTkZMR0FNRS0yNUFVRzE2QVJJREVOLUFSSSIsInRvdGFsIjoxMDB9"
                         },
                         "has_more": {
                           "type": "boolean",
