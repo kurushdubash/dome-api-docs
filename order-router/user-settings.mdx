@@ -10,13 +10,13 @@ The User Settings API allows you to configure affiliate addresses and other sett
 Configure your affiliate address to receive a share of fees on all orders placed with your API key.
 
 ```
-POST /v1/polymarket/users/affiliate
+POST /v1/polymarket/affiliate
 ```
 
 ### Request
 
 ```bash
-curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -96,7 +96,7 @@ If you're building a platform that routes orders through Dome, configure your af
 
 ```bash
 # One-time setup
-curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
   -H "Authorization: Bearer YOUR_PLATFORM_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"affiliateAddress": "0xYourPlatformWallet..."}'
@@ -110,7 +110,7 @@ If you manage multiple API keys for different users, you can configure each key 
 
 ```bash
 # Set affiliate for user A
-curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
   -H "Authorization: Bearer ADMIN_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -119,7 +119,7 @@ curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
   }'
 
 # Set affiliate for user B
-curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
   -H "Authorization: Bearer ADMIN_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

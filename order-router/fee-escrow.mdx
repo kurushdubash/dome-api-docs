@@ -15,6 +15,18 @@ The Fee Escrow feature allows platforms to collect fees on orders placed through
 Fee Escrow is an **opt-in feature**. Orders without fee authorization work exactly as before.
 </Note>
 
+## Endpoints Quick Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/v1/polymarket/placeOrder` | [Place order with fee escrow](#rest-endpoint) |
+| `GET` | `/v1/polymarket/orders/:orderId` | [Get order status](#get-escrow-order) |
+| `GET` | `/v1/polymarket/orders` | [List escrow orders](#list-escrow-orders) |
+| `DELETE` | `/v1/polymarket/orders/:orderId` | [Cancel order and refund](#cancel-escrow-order) |
+| `POST` | `/v1/polymarket/affiliate` | [Set affiliate address](/order-router/user-settings#set-affiliate-address) |
+| `GET` | `/v1/polymarket/fees` | [Get fee configuration](/order-router/user-settings) |
+| `PUT` | `/v1/polymarket/fees` | [Update fee configuration](/order-router/user-settings) |
+
 ## How It Works
 
 ```
@@ -317,7 +329,7 @@ For a persistent affiliate address tied to your API key, use the User Settings A
 
 ```bash
 # Set affiliate address for your API key
-curl -X POST https://api.domeapi.com/v1/polymarket/users/affiliate \
+curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -456,10 +468,10 @@ The following REST endpoints are available for managing escrow orders.
 
 ### Get Escrow Order
 
-Retrieve details of a specific escrow order by ID.
+Retrieve details of a specific escrow order by ID (escrowOrderId or polymarketOrderId).
 
 ```
-GET /polymarket/escrow/order/:orderId
+GET /v1/polymarket/orders/:orderId
 ```
 
 **Response:**
@@ -492,7 +504,7 @@ GET /polymarket/escrow/order/:orderId
 Retrieve a list of escrow orders with optional filters.
 
 ```
-GET /polymarket/escrow/orders
+GET /v1/polymarket/orders
 ```
 
 **Query Parameters:**
@@ -537,49 +549,28 @@ GET /polymarket/escrow/orders
 
 ### Cancel Escrow Order
 
-Cancel an escrow order and initiate a refund. Only callable for orders in `pending` status.
+Cancel an escrow order and initiate a refund. Only callable for orders in `pending` or `open` status.
 
 ```
-POST /polymarket/escrow/cancel/:orderId
-```
-
-**Response:**
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": "1",
-  "result": {
-    "success": true,
-    "message": "Order cancelled and refund initiated",
-    "orderId": "0x...",
-    "refundTxHash": "0x..."
-  }
-}
-```
-
-### Delete Escrow Order
-
-Cancel an escrow order and remove it from the database. Only callable for orders in `pending` status.
-
-```
-DELETE /polymarket/escrow/order/:orderId
+DELETE /v1/polymarket/orders/:orderId
 ```
 
 **Response:**
 
 ```json
 {
-  "jsonrpc": "2.0",
-  "id": "1",
-  "result": {
-    "success": true,
-    "message": "Order cancelled and deleted",
-    "orderId": "0x...",
-    "refundTxHash": "0x..."
-  }
+  "success": true,
+  "escrowOrderId": "0x...",
+  "polymarketOrderId": "abc123",
+  "status": "cancelled",
+  "refunded": "12500",
+  "refundTxHash": "0x..."
 }
 ```
+
+<Note>
+The `POST /orders/:orderId/cancel` endpoint is also available for backward compatibility but `DELETE /orders/:orderId` is preferred.
+</Note>
 
 ### Order Status Values
 
