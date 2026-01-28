@@ -640,7 +640,20 @@ The fee is refunded to the payer via the escrow contract.
 
 **Q: What's the minimum fee?**
 
-Fees must be at least 0.01% of order size to prevent dust.
+Fees must meet **both** requirements:
+- At least **0.01% of order size** (to prevent dust)
+- At least **$0.01 USDC** minimum
+
+**Q: How is the affiliate address resolved?**
+
+When processing an order, the system resolves the affiliate address using this priority (highest first):
+
+1. **Server-side config** - Affiliate address set via API key settings (`POST /v1/polymarket/affiliate`)
+2. **Client-provided** - `affiliateAddress` parameter in the order request
+3. **Default affiliate** - Environment-configured default (if any)
+4. **Zero address** - If none of the above, all fees go to Dome
+
+Server-side configuration always takes priority, ensuring platforms receive their fee share regardless of what the client sends.
 
 **Q: How do I become an affiliate?**
 
