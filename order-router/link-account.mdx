@@ -15,10 +15,11 @@ Account linking creates Polymarket CLOB API credentials for a user's wallet. Thi
 
 ## Overview
 
-The linking flow has two steps:
+The linking flow has two steps for EOA wallets, and three steps for Safe wallets that need allowances:
 
 1. **Prepare** - Server generates an EIP-712 payload for the user to sign
 2. **Complete** - User signs the payload, server derives Polymarket credentials
+3. **Set Allowances** *(Safe wallets only)* - Sign and submit allowance transaction
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -38,19 +39,14 @@ The linking flow has two steps:
 │                                                                     │
 │                                     ◄─────────────────────────────  │
 │  { credentials, signerAddress, safeAddress?,                        │
-│    safeDeployed?, safeDeployTxHash? }                               │
+│    safeDeployed?, safeDeployTxHash?,                                │
+│    safeTxPayload?, allowancesToSet? }      ◄── For fresh Safes      │
 │                                                                     │
 │  ═══════════════════════════════════════════════════════════════    │
-│  [For Safe wallets only, if hasAllowances: false]                   │
+│  [For Safe wallets only, if allowancesToSet present]                │
 │  ═══════════════════════════════════════════════════════════════    │
 │                                                                     │
-│  POST /v1/polymarket/link-set-allowances-prepare ────────►          │
-│  { sessionId, chainId }                                             │
-│                                                                     │
-│                                     ◄─────────────────────────────  │
-│  { safeTxPayload, messageHash, allowancesToSet, nonce }             │
-│                                                                     │
-│  [User signs messageHash with signMessage (eth_sign)]               │
+│  [User signs safeTxPayload.messageHash with signMessage (eth_sign)] │
 │                                                                     │
 │  POST /v1/polymarket/link-set-allowances ────────────────►          │
 │  { sessionId, chainId, allowanceSignature }                         │
@@ -59,6 +55,10 @@ The linking flow has two steps:
 │  { success, allowancesSet, transactionHash }                        │
 └─────────────────────────────────────────────────────────────────────┘
 ```
+
+<Note>
+**Streamlined Flow for Fresh Safes:** When a Safe is deployed during `/link-complete`, the response includes `safeTxPayload` and `allowancesToSet`. You can sign the `messageHash` directly and call `/link-set-allowances` - no need to call `/link-set-allowances-prepare`.
+</Note>
 
 ## When to Use Direct Endpoints vs SDK
 
@@ -581,7 +581,31 @@ When `deploymentSignature` was provided and the Safe was deployed during this re
     "signerAddress": "0x1234567890123456789012345678901234567890",
     "safeAddress": "0xABCD...",
     "safeDeployed": true,
-    "safeDeployTxHash": "0x1234567890abcdef..."
+    "safeDeployTxHash": "0x1234567890abcdef...",
+    "safeTxPayload": {
+      "domain": {
+        "chainId": 137,
+        "verifyingContract": "0xABCD..."
+      },
+      "types": {
+        "SafeTx": [
+          { "name": "to", "type": "address" },
+          { "name": "value", "type": "uint256" },
+          { "name": "data", "type": "bytes" },
+          { "name": "operation", "type": "uint8" },
+          { "name": "safeTxGas", "type": "uint256" },
+          { "name": "baseGas", "type": "uint256" },
+          { "name": "gasPrice", "type": "uint256" },
+          { "name": "gasToken", "type": "address" },
+          { "name": "refundReceiver", "type": "address" },
+          { "name": "nonce", "type": "uint256" }
+        ]
+      },
+      "primaryType": "SafeTx",
+      "message": { ... },
+      "messageHash": "0x1234567890abcdef..."
+    },
+    "allowancesToSet": ["CTF_EXCHANGE", "NEG_RISK_CTF_EXCHANGE", "NEG_RISK_ADAPTER"]
   }
 }
 ```
@@ -590,18 +614,59 @@ When `deploymentSignature` was provided and the Safe was deployed during this re
 |----------------|------|-------------|
 | `safeDeployed` | `boolean` | `true` if the Safe was deployed during this request |
 | `safeDeployTxHash` | `string` | Transaction hash of the Safe deployment (only present when `safeDeployed: true`) |
+| `safeTxPayload` | `object` | SafeTx EIP-712 payload for setting allowances (only for freshly deployed Safes) |
+| `allowancesToSet` | `string[]` | List of allowances to set: `CTF_EXCHANGE`, `NEG_RISK_CTF_EXCHANGE`, `NEG_RISK_ADAPTER` |
+
+<Note>
+**Streamlined Flow:** When `safeTxPayload` is present, you can sign `safeTxPayload.messageHash` directly using `signMessage` (eth_sign) and call `/link-set-allowances` without calling `/link-set-allowances-prepare`. This is possible because freshly deployed Safes have nonce=0.
+</Note>
 
 ---
 
 ## Set Allowances (Safe Wallets Only)
 
-For Safe wallets, USDC allowances must be set before trading. If `/v1/polymarket/link-prepare` returns `hasAllowances: false` in the `safeInfo`, use this two-step flow to set the required approvals.
+For Safe wallets, USDC allowances must be set before trading. There are two ways to set allowances:
+
+1. **Streamlined Flow** *(recommended for fresh Safes)*: When `/link-complete` returns `safeTxPayload`, sign the `messageHash` directly and call `/link-set-allowances`
+2. **Standard Flow**: Call `/link-set-allowances-prepare` to get the SafeTx payload, then sign and submit
 
 <Warning>
 The session is available for **30 minutes** after `/v1/polymarket/link-complete`. If the session expires, you'll need to restart the linking flow.
 </Warning>
 
-### Step 1: Prepare Allowances
+### Streamlined Flow (Fresh Safes)
+
+When the Safe was just deployed (nonce=0), `/link-complete` returns `safeTxPayload` with the `messageHash` to sign:
+
+```typescript
+// After /link-complete, check for safeTxPayload
+const { credentials, safeTxPayload, allowancesToSet } = completeData.result;
+
+if (safeTxPayload && allowancesToSet?.length > 0) {
+  // Sign the messageHash directly using signMessage (eth_sign)
+  const allowanceSignature = await wallet.signMessage(
+    ethers.utils.arrayify(safeTxPayload.messageHash)
+  );
+
+  // Submit to /link-set-allowances (skip /link-set-allowances-prepare)
+  const response = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'setAllowances',
+      id: crypto.randomUUID(),
+      params: { sessionId, chainId: 137, allowanceSignature },
+    }),
+  });
+}
+```
+
+### Standard Flow (Existing Safes)
+
+For Safes that already exist (not freshly deployed), use `/link-set-allowances-prepare` to get the SafeTx payload.
+
+### Step 1: Prepare Allowances (Standard Flow)
 
 **`POST /v1/polymarket/link-set-allowances-prepare`**
 
@@ -1034,9 +1099,36 @@ if (safeDeployed) {
   console.log(`Safe deployed! Transaction: ${safeDeployTxHash}`);
 }
 
-// 6. Set allowances if needed (two-step flow)
-if (safeInfo && !safeInfo.hasAllowances) {
-  // 6a. Prepare - get SafeTx payload
+// 6. Set allowances if needed
+// For freshly deployed Safes, safeTxPayload is included in link-complete response (streamlined flow)
+// For existing Safes, call /link-set-allowances-prepare first (standard flow)
+const { safeTxPayload: allowancesPayload, allowancesToSet } = completeData.result;
+
+if (allowancesPayload && allowancesToSet?.length > 0) {
+  // Streamlined flow: safeTxPayload already included in link-complete response
+  // Sign the messageHash using signMessage (eth_sign)
+  const allowanceSignature = await privy.signMessage({
+    walletId,
+    message: allowancesPayload.messageHash,
+  });
+
+  // Submit - execute the allowance transactions
+  const allowanceResponse = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'setAllowances',
+      id: crypto.randomUUID(),
+      params: { sessionId, chainId: 137, allowanceSignature },
+    }),
+  });
+
+  const allowanceData = await allowanceResponse.json();
+  console.log('Allowances set:', allowanceData.result.allowancesSet);
+  console.log('Transaction hash:', allowanceData.result.transactionHash);
+} else if (safeInfo && !safeInfo.hasAllowances) {
+  // Standard flow for existing Safes: call /link-set-allowances-prepare first
   const prepareAllowanceResponse = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances-prepare', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1049,16 +1141,14 @@ if (safeInfo && !safeInfo.hasAllowances) {
   });
 
   const prepareAllowanceData = await prepareAllowanceResponse.json();
-  const { safeTxPayload, allowancesToSet } = prepareAllowanceData.result;
+  const { safeTxPayload, allowancesToSet: toSet } = prepareAllowanceData.result;
 
-  if (allowancesToSet.length > 0) {
-    // 6b. Sign the messageHash using signMessage (eth_sign)
+  if (toSet.length > 0) {
     const allowanceSignature = await privy.signMessage({
       walletId,
       message: safeTxPayload.messageHash,
     });
 
-    // 6c. Submit - execute the allowance transactions
     const allowanceResponse = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
