@@ -39,6 +39,24 @@ The linking flow has two steps:
 │                                     ◄─────────────────────────────  │
 │  { credentials, signerAddress, safeAddress?,                        │
 │    safeDeployed?, safeDeployTxHash? }                               │
+│                                                                     │
+│  ═══════════════════════════════════════════════════════════════    │
+│  [For Safe wallets only, if hasAllowances: false]                   │
+│  ═══════════════════════════════════════════════════════════════    │
+│                                                                     │
+│  POST /v1/polymarket/link-set-allowances-prepare ────────►          │
+│  { sessionId, chainId }                                             │
+│                                                                     │
+│                                     ◄─────────────────────────────  │
+│  { safeTxPayload, messageHash, allowancesToSet, nonce }             │
+│                                                                     │
+│  [User signs messageHash with signMessage (eth_sign)]               │
+│                                                                     │
+│  POST /v1/polymarket/link-set-allowances ────────────────►          │
+│  { sessionId, chainId, allowanceSignature }                         │
+│                                                                     │
+│                                     ◄─────────────────────────────  │
+│  { success, allowancesSet, transactionHash }                        │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -577,75 +595,73 @@ When `deploymentSignature` was provided and the Safe was deployed during this re
 
 ## Set Allowances (Safe Wallets Only)
 
-**`POST /v1/polymarket/link-set-allowances`**
-
-For Safe wallets, USDC allowances must be set before trading. If `/v1/polymarket/link-prepare` returns `hasAllowances: false` in the `safeInfo`, call this endpoint to set the required approvals.
-
-<Note>
-This endpoint reuses the `sessionId` from a completed `/v1/polymarket/link-complete` call. No additional signature is required - the session already proves ownership of the EOA wallet. Call this immediately after `/v1/polymarket/link-complete` if allowances are missing.
-</Note>
+For Safe wallets, USDC allowances must be set before trading. If `/v1/polymarket/link-prepare` returns `hasAllowances: false` in the `safeInfo`, use this two-step flow to set the required approvals.
 
 <Warning>
 The session is available for **30 minutes** after `/v1/polymarket/link-complete`. If the session expires, you'll need to restart the linking flow.
 </Warning>
 
+### Step 1: Prepare Allowances
+
+**`POST /v1/polymarket/link-set-allowances-prepare`**
+
+Get the SafeTx payload that the user needs to sign.
+
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://api.domeapi.io/v1/polymarket/link-set-allowances \
+curl -X POST https://api.domeapi.io/v1/polymarket/link-set-allowances-prepare \
   -H "Content-Type: application/json" \
   -d '{
     "jsonrpc": "2.0",
-    "method": "setAllowances",
+    "method": "setAllowancesPrepare",
     "id": "req-3",
     "params": {
-      "sessionId": "550e8400-e29b-41d4-a716-446655440000"
+      "sessionId": "550e8400-e29b-41d4-a716-446655440000",
+      "chainId": 137
     }
   }'
 ```
 
 ```typescript TypeScript
-// After successful /v1/polymarket/link-complete, use the same sessionId to set allowances
-const response = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
+// After successful /v1/polymarket/link-complete, use the same sessionId
+const prepareResponse = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances-prepare', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     jsonrpc: '2.0',
-    method: 'setAllowances',
+    method: 'setAllowancesPrepare',
     id: 'req-3',
     params: {
-      sessionId: sessionId, // Same sessionId from /v1/polymarket/link-prepare
+      sessionId: sessionId,
+      chainId: 137,
     },
   }),
 });
 
-const data = await response.json();
-
-if (data.result?.success) {
-  console.log('Allowances set for:', data.result.safeAddress);
-  console.log('Allowances set:', data.result.allowancesSet);
-}
+const prepareData = await prepareResponse.json();
+const { safeTxPayload, allowancesToSet, nonce } = prepareData.result;
 ```
 
 ```python Python
 import requests
 
-# After successful /v1/polymarket/link-complete, use the same session_id
 response = requests.post(
-    'https://api.domeapi.io/v1/polymarket/link-set-allowances',
+    'https://api.domeapi.io/v1/polymarket/link-set-allowances-prepare',
     json={
         'jsonrpc': '2.0',
-        'method': 'setAllowances',
+        'method': 'setAllowancesPrepare',
         'id': 'req-3',
         'params': {
-            'sessionId': session_id,  # Same session_id from /v1/polymarket/link-prepare
+            'sessionId': session_id,
+            'chainId': 137,
         },
     },
 )
 
 data = response.json()
-if data.get('result', {}).get('success'):
-    print(f"Allowances set for: {data['result']['safeAddress']}")
+safe_tx_payload = data['result']['safeTxPayload']
+message_hash = safe_tx_payload['messageHash']
 ```
 
 </CodeGroup>
@@ -664,10 +680,44 @@ if data.get('result', {}).get('success'):
   "jsonrpc": "2.0",
   "id": "req-3",
   "result": {
-    "success": true,
+    "sessionId": "550e8400-e29b-41d4-a716-446655440000",
     "safeAddress": "0xABCD...",
-    "allowancesSet": ["CTF_EXCHANGE", "NEG_RISK_CTF_EXCHANGE", "NEG_RISK_ADAPTER"],
-    "transactionId": "0x..."
+    "safeTxPayload": {
+      "domain": {
+        "chainId": 137,
+        "verifyingContract": "0xABCD..."
+      },
+      "types": {
+        "SafeTx": [
+          { "name": "to", "type": "address" },
+          { "name": "value", "type": "uint256" },
+          { "name": "data", "type": "bytes" },
+          { "name": "operation", "type": "uint8" },
+          { "name": "safeTxGas", "type": "uint256" },
+          { "name": "baseGas", "type": "uint256" },
+          { "name": "gasPrice", "type": "uint256" },
+          { "name": "gasToken", "type": "address" },
+          { "name": "refundReceiver", "type": "address" },
+          { "name": "nonce", "type": "uint256" }
+        ]
+      },
+      "primaryType": "SafeTx",
+      "message": {
+        "to": "0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761",
+        "value": "0",
+        "data": "0x8d80ff0a...",
+        "operation": 1,
+        "safeTxGas": "0",
+        "baseGas": "0",
+        "gasPrice": "0",
+        "gasToken": "0x0000000000000000000000000000000000000000",
+        "refundReceiver": "0x0000000000000000000000000000000000000000",
+        "nonce": 0
+      },
+      "messageHash": "0x1234567890abcdef..."
+    },
+    "allowancesToSet": ["CTF_EXCHANGE", "NEG_RISK_CTF_EXCHANGE", "NEG_RISK_ADAPTER"],
+    "nonce": 0
   }
 }
 ```
@@ -679,9 +729,159 @@ if data.get('result', {}).get('success'):
   "jsonrpc": "2.0",
   "id": "req-3",
   "result": {
+    "sessionId": "550e8400-e29b-41d4-a716-446655440000",
+    "safeAddress": "0xABCD...",
+    "safeTxPayload": { ... },
+    "allowancesToSet": [],
+    "nonce": 0
+  }
+}
+```
+
+<Note>
+If `allowancesToSet` is empty, all allowances are already set. You can skip the signing and submission steps.
+</Note>
+
+### Step 2: Sign the SafeTx Hash
+
+Sign the `messageHash` from the prepare response using `eth_sign` (personal sign). This is different from EIP-712 signing - you sign the hash directly as a message.
+
+<CodeGroup>
+
+```typescript ethers.js
+import { ethers } from 'ethers';
+
+// Sign the messageHash using signMessage (eth_sign)
+// This applies the Ethereum message prefix automatically
+const allowanceSignature = await wallet.signMessage(
+  ethers.utils.arrayify(safeTxPayload.messageHash)
+);
+```
+
+```typescript viem
+import { toBytes } from 'viem';
+
+// Sign the messageHash using signMessage (eth_sign)
+const allowanceSignature = await walletClient.signMessage({
+  message: { raw: toBytes(safeTxPayload.messageHash) },
+});
+```
+
+```typescript Privy
+// Sign the messageHash using Privy's signMessage
+const allowanceSignature = await privy.signMessage({
+  walletId,
+  message: safeTxPayload.messageHash,
+});
+```
+
+```javascript MetaMask (Browser)
+// Sign using personal_sign
+const allowanceSignature = await ethereum.request({
+  method: 'personal_sign',
+  params: [safeTxPayload.messageHash, walletAddress],
+});
+```
+
+</CodeGroup>
+
+<Warning>
+Use `signMessage` (eth_sign / personal_sign), NOT `signTypedData`. The server expects a signature created with the Ethereum message prefix.
+</Warning>
+
+### Step 3: Submit Allowances
+
+**`POST /v1/polymarket/link-set-allowances`**
+
+Submit the signature to execute the allowance transactions on-chain.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.domeapi.io/v1/polymarket/link-set-allowances \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "setAllowances",
+    "id": "req-4",
+    "params": {
+      "sessionId": "550e8400-e29b-41d4-a716-446655440000",
+      "chainId": 137,
+      "allowanceSignature": "0x1234...abcd"
+    }
+  }'
+```
+
+```typescript TypeScript
+const response = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    jsonrpc: '2.0',
+    method: 'setAllowances',
+    id: 'req-4',
+    params: {
+      sessionId: sessionId,
+      chainId: 137,
+      allowanceSignature: allowanceSignature,
+    },
+  }),
+});
+
+const data = await response.json();
+
+if (data.result?.success) {
+  console.log('Allowances set for:', data.result.safeAddress);
+  console.log('Allowances set:', data.result.allowancesSet);
+  console.log('Transaction hash:', data.result.transactionHash);
+}
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.domeapi.io/v1/polymarket/link-set-allowances',
+    json={
+        'jsonrpc': '2.0',
+        'method': 'setAllowances',
+        'id': 'req-4',
+        'params': {
+            'sessionId': session_id,
+            'chainId': 137,
+            'allowanceSignature': allowance_signature,
+        },
+    },
+)
+
+data = response.json()
+if data.get('result', {}).get('success'):
+    print(f"Allowances set for: {data['result']['safeAddress']}")
+    print(f"Transaction hash: {data['result'].get('transactionHash')}")
+```
+
+</CodeGroup>
+
+**Request Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `sessionId` | `string` | Yes | - | Session ID from a completed `/v1/polymarket/link-complete` call |
+| `chainId` | `number` | No | `137` | Chain ID (137 = Polygon mainnet) |
+| `allowanceSignature` | `string` | Yes | - | Signature of the `messageHash` from `/link-set-allowances-prepare` (0x-prefixed hex) |
+
+**Success Response:**
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "req-4",
+  "result": {
     "success": true,
     "safeAddress": "0xABCD...",
-    "allowancesSet": []
+    "allowancesSet": ["CTF_EXCHANGE", "NEG_RISK_CTF_EXCHANGE", "NEG_RISK_ADAPTER"],
+    "transactionId": "019c022e-a853-78de-aa52-f59fd469d3d7",
+    "transactionHash": "0x423b0c5c691aa34c37f793ed874b719ceb03a74cd3a98e3b550ecb5d095d86c8"
   }
 }
 ```
@@ -834,21 +1034,46 @@ if (safeDeployed) {
   console.log(`Safe deployed! Transaction: ${safeDeployTxHash}`);
 }
 
-// 6. Set allowances if needed
+// 6. Set allowances if needed (two-step flow)
 if (safeInfo && !safeInfo.hasAllowances) {
-  const allowanceResponse = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
+  // 6a. Prepare - get SafeTx payload
+  const prepareAllowanceResponse = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances-prepare', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       jsonrpc: '2.0',
-      method: 'setAllowances',
+      method: 'setAllowancesPrepare',
       id: crypto.randomUUID(),
-      params: { sessionId },
+      params: { sessionId, chainId: 137 },
     }),
   });
 
-  const allowanceData = await allowanceResponse.json();
-  console.log('Allowances set:', allowanceData.result.allowancesSet);
+  const prepareAllowanceData = await prepareAllowanceResponse.json();
+  const { safeTxPayload, allowancesToSet } = prepareAllowanceData.result;
+
+  if (allowancesToSet.length > 0) {
+    // 6b. Sign the messageHash using signMessage (eth_sign)
+    const allowanceSignature = await privy.signMessage({
+      walletId,
+      message: safeTxPayload.messageHash,
+    });
+
+    // 6c. Submit - execute the allowance transactions
+    const allowanceResponse = await fetch('https://api.domeapi.io/v1/polymarket/link-set-allowances', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'setAllowances',
+        id: crypto.randomUUID(),
+        params: { sessionId, chainId: 137, allowanceSignature },
+      }),
+    });
+
+    const allowanceData = await allowanceResponse.json();
+    console.log('Allowances set:', allowanceData.result.allowancesSet);
+    console.log('Transaction hash:', allowanceData.result.transactionHash);
+  }
 }
 
 console.log('Safe wallet linked successfully!');
