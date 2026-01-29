@@ -4,11 +4,11 @@ description: "Manage affiliate addresses and fee configurations for your API key
 ---
 
 <Warning>
-**Beta - Use Only If Necessary**
+  **Beta - Use Only If Necessary**
 
-These endpoints are in beta and still being tested. For most use cases, we strongly recommend using the [SDK](/order-router/index) and [quickstart examples](/order-router/index#quick-start), which handle the complex signing logic for you.
+  These endpoints are in beta and still being tested. For most use cases, we strongly recommend using the [SDK](/order-router/index) and [quickstart examples](/order-router/index#quick-start), which handle the complex signing logic for you.
 
-Only use these direct endpoints if you have specific requirements that the SDK cannot address.
+  Only use these direct endpoints if you have specific requirements that the SDK cannot address.
 </Warning>
 
 The User Settings API allows you to configure affiliate addresses and other settings that persist with your API key. These settings apply to all orders placed using your API key.
@@ -24,7 +24,7 @@ POST /v1/polymarket/affiliate
 ### Request
 
 ```bash
-curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
+curl -X POST https://api.domeapi.io/v1/polymarket/affiliate \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -34,10 +34,10 @@ curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
 
 ### Request Body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `affiliateAddress` | `string` | Yes | Valid Polygon address (0x + 40 hex chars) |
-| `apiKey` | `string` | No | API key to update (defaults to your authenticated key) |
+| Field              | Type     | Required | Description                                            |
+| ------------------ | -------- | -------- | ------------------------------------------------------ |
+| `affiliateAddress` | `string` | Yes      | Valid Polygon address (0x + 40 hex chars)              |
+| `apiKey`           | `string` | No       | API key to update (defaults to your authenticated key) |
 
 ### Response
 
@@ -53,6 +53,7 @@ curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
 ### Error Responses
 
 **Invalid Address Format (400)**
+
 ```json
 {
   "error": "INVALID_ADDRESS",
@@ -61,6 +62,7 @@ curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
 ```
 
 **API Key Not Found (404)**
+
 ```json
 {
   "error": "NOT_FOUND",
@@ -104,7 +106,7 @@ If you're building a platform that routes orders through Dome, configure your af
 
 ```bash
 # One-time setup
-curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
+curl -X POST https://api.domeapi.io/v1/polymarket/affiliate \
   -H "Authorization: Bearer YOUR_PLATFORM_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"affiliateAddress": "0xYourPlatformWallet..."}'
@@ -118,7 +120,7 @@ If you manage multiple API keys for different users, you can configure each key 
 
 ```bash
 # Set affiliate for user A
-curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
+curl -X POST https://api.domeapi.io/v1/polymarket/affiliate \
   -H "Authorization: Bearer ADMIN_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -127,7 +129,7 @@ curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
   }'
 
 # Set affiliate for user B
-curl -X POST https://api.domeapi.com/v1/polymarket/affiliate \
+curl -X POST https://api.domeapi.io/v1/polymarket/affiliate \
   -H "Authorization: Bearer ADMIN_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
