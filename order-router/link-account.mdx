@@ -631,6 +631,17 @@ For Safe wallets, USDC allowances must be set before trading. There are two ways
 2. **Standard Flow**: Call `/link-set-allowances-prepare` to get the SafeTx payload, then sign and submit
 
 <Warning>
+**Critical: Use `signMessage`, NOT `signTypedData`!**
+
+The allowance signature uses a different signing method than the credential signature:
+
+- **Credentials** (link-complete): Use `signTypedData` / EIP-712
+- **Allowances** (link-set-allowances): Use `signMessage` / `personal_sign` / `eth_sign`
+
+Using the wrong signing method will result in **error code 2004: Invalid allowance signature**.
+</Warning>
+
+<Warning>
 The session is available for **30 minutes** after `/v1/polymarket/link-complete`. If the session expires, you'll need to restart the linking flow.
 </Warning>
 
@@ -1206,7 +1217,7 @@ curl https://api.domeapi.io/v1/polymarket/link-health
 | `2001` | `INVALID_WALLET_ADDRESS` | Invalid wallet address format |
 | `2002` | `SESSION_NOT_FOUND` | Session ID not found |
 | `2003` | `SESSION_EXPIRED` | Session expired (10 min incomplete, 30 min after completion) |
-| `2004` | `INVALID_SIGNATURE` | Signature verification failed |
+| `2004` | `INVALID_SIGNATURE` | Signature verification failed. For allowances, ensure you're using `signMessage`, not `signTypedData` |
 | `2005` | `CREDENTIAL_DERIVATION_FAILED` | Failed to derive credentials from Polymarket |
 | `2006` | `SAFE_DEPLOYMENT_FAILED` | Safe wallet deployment failed |
 | `2007` | `SAFE_NOT_DEPLOYED` | Safe wallet not deployed and autoDeploySafe=false |
