@@ -39,6 +39,28 @@
 - Commit frequently throughout development
 - NEVER skip or disable pre-commit hooks
 
+## PR & Deployment Workflow
+
+**CRITICAL: Always follow this workflow when publishing changes:**
+
+1. **Create a PR for your changes** - Never push directly to main
+2. **Merge the PR to main** - Use `gh pr merge <PR#> --squash`
+3. **Sync with remote main before any deployment/publishing:**
+   ```bash
+   git fetch origin main && git reset --hard origin/main
+   ```
+
+**Why this matters:**
+- Ensures published docs match what's merged to main
+- Prevents publishing unreviewed or local-only changes
+- Creates an audit trail of changes via PRs
+- Allows easy rollback by reverting PRs
+
+**Never do:**
+- Push directly to main without a PR
+- Deploy/publish without merging your PR first
+- Skip syncing with remote main
+
 ## Do not
 - Skip frontmatter on any MDX file
 - Use absolute URLs for internal links
