@@ -3,31 +3,30 @@ title: "Dome API"
 description: "Welcome to Dome - the ultimate API for prediction markets"
 ---
 
+<Danger>
+  # **Dome has been acquired by Polymarket**
+
+  Read the full announcement [**here**.](http://here.As)
+
+  As such, all Dome APIs will reach end of life on **April 28th, 2026**.
+
+  For additional APIs and prediction market data, we recommend using the new APIs from Polymarket [**here**](https://docs.polymarket.com/api-reference/introduction).
+</Danger>
+
 ## What is Dome API?
 
 Dome API provides comprehensive access to prediction market data across multiple platforms including Polymarket and Kalshi. Get real-time market prices, historical candlestick data, wallet analytics, order tracking, and cross-platform market matching. Get started with a free API key [here](https://dashboard.domeapi.io/).
-
-## Tier Limits
-
-Rate limits are tiered by subscription level:
-
-| Tier | Queries Per Second | Queries Per 10 Seconds |
-|------|--------------|-------------------------|
-| **Free** | 10 | 100 |
-| **Dev** | 100 | 500 |
-| **Pro** | 300 | 3000 |
-| **Enterprise** | Custom | Custom |
 
 ## Quick Start
 
 ### 1. Get Your API Key
 
-[Sign up](https://dashboard.domeapi.io/) for an account and get your API Key from the dashboard.
-![Hero Light Pn](/images/hero-light.png)
+[Sign up](https://dashboard.domeapi.io/) for an account and get your API Key from the dashboard. <img src="/images/hero-light.png" alt="Hero Light Pn" />
 
 ### 2. Install SDK
 
 <CodeGroup>
+
 ```bash TypeScript
 npm install @dome-api/sdk
 ```
@@ -41,6 +40,7 @@ pip install dome-api-sdk
 ### 3. Make Your First Request
 
 <CodeGroup>
+
 ```typescript TypeScript
 import { DomeClient } from '@dome-api/sdk';
 
@@ -53,8 +53,7 @@ token_id: '982504454476993686795165292073652550187907214645908332090642662542380
 });
 
 console.log('Market Price:', marketPrice.price);
-
-````
+```
 
 ```python Python
 from dome_api_sdk import DomeClient
@@ -65,7 +64,7 @@ market_price = dome.polymarket.markets.get_market_price({
     "token_id": "98250445447699368679516529207365255018790721464590833209064266254238063117329"
 })
 print(f"Market Price: {market_price.price}")
-````
+```
 
 </CodeGroup>
 
